@@ -19,9 +19,7 @@ const Navbar = () => {
             to="/"
             className="text-center leading-tight cursor-pointer group"
           >
-            <p className="text-[10px] tracking-[0.3em] text-gray-600  transition">
-              HAR PATA HUMEIN PATA HAI
-            </p>
+            
             <h1 className="text-2xl font-extrabold text-black group-hover:text-emerald-600 transition">
               ANAND CORPORATION
             </h1>

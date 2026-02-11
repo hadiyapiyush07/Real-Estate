@@ -74,24 +74,40 @@ const AuthModal = () => {
   /* ================= SUBMIT ================= */
 
   const handleSignup = () => {
-    if (!validateSignup()) return;
+  if (!validateSignup()) return;
 
-    alert("Account created successfully ✅");
+  alert("Account created successfully ✅");
 
-    setTimeout(() => {
-      window.location.reload();
-    }, 800);
-  };
+  // Save role temporarily (later connect backend)
+  localStorage.setItem("userRole", role);
+
+  setTimeout(() => {
+    if (role === "seller") {
+      navigate("/seller/add-property");
+    } else {
+      navigate("/");
+    }
+  }, 500);
+};
+
 
   const handleSignin = () => {
-    if (!validateSignin()) return;
+  if (!validateSignin()) return;
 
-    alert("Logged in successfully ✅");
+  alert("Logged in successfully ✅");
 
-    setTimeout(() => {
-      window.location.reload();
-    }, 800);
-  };
+  // For now simulate role (later fetch from backend)
+  const savedRole = localStorage.getItem("userRole") || "buyer";
+
+  setTimeout(() => {
+    if (savedRole === "seller") {
+      navigate("/seller/add-property");
+    } else {
+      navigate("/");
+    }
+  }, 500);
+};
+
 
   return (
     <motion.div

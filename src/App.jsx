@@ -15,10 +15,15 @@ import AreaConverter from "./pages/AreaConverter";
 function App() {
   const location = useLocation();
 
+  /* Hide Navbar + Footer on Property Modal Page */
   const hideLayout = location.pathname.startsWith("/property");
+
+  /* Hide ONLY Footer on Buy Page */
+  const hideFooterOnBuy = location.pathname.startsWith("/buy");
 
   return (
     <>
+      {/* NAVBAR */}
       {!hideLayout && <Navbar />}
 
       <Routes>
@@ -33,7 +38,8 @@ function App() {
         <Route path="/area-converter" element={<AreaConverter />} />
       </Routes>
 
-      {!hideLayout && <Footer />}
+      {/* FOOTER */}
+      {!hideLayout && !hideFooterOnBuy && <Footer />}
     </>
   );
 }

@@ -1,7 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BuyTopBar from "../components/BuyTopBar";
 
 /* ===== Fix Marker Icons ===== */
@@ -21,111 +21,111 @@ const gujaratBounds = [
   [24.7, 74.5],
 ];
 
-/* ===== Demo Properties ===== */
-const propertiesData = [
+/* ===== EXISTING DEMO PROPERTIES ===== */
+const demoProperties = [
   {
-    id: 1,
-    title: "Agricultural Land",
-    location: "Ahmedabad",
-    priceNumber: 10000000,
-    pricePerUnit: "1.00 Cr",
+    id: "demo1",
+    propertyType: "Agricultural Land",
+    city: "Ahmedabad",
+    district: "Ahmedabad",
+    totalPrice: 10000000,
+    area: "1",
     unit: "Bigha",
-    totalPrice: "1.00 Cr",
-    area: "1 Bigha",
-    type: "Agricultural",
     coords: [23.0225, 72.5714],
     image:
       "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
   },
   {
-    id: 2,
-    title: "Farm Land",
-    location: "Rajkot",
-    priceNumber: 115200000,
-    pricePerUnit: "96.00 Lakh",
+    id: "demo2",
+    propertyType: "Farm Land",
+    city: "Rajkot",
+    district: "Rajkot",
+    totalPrice: 115200000,
+    area: "12",
     unit: "Bigha",
-    totalPrice: "11.52 Cr",
-    area: "12 Bigha",
-    type: "Agricultural",
     coords: [22.3039, 70.8022],
     image:
       "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
-  },
-  {
-    id: 3,
-    title: "Green Field",
-    location: "Surat",
-    priceNumber: 144000000,
-    pricePerUnit: "80.00 Lakh",
-    unit: "Bigha",
-    totalPrice: "14.40 Cr",
-    area: "18 Bigha",
-    type: "Agricultural",
-    coords: [21.1702, 72.8311],
-    image:
-      "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
   },
 ];
 
 const Buy = () => {
   const navigate = useNavigate();
 
-  const [filtered, setFiltered] = useState(propertiesData);
+  const [properties, setProperties] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [selectedCity, setSelectedCity] = useState("");
 
-  /* ========= MAIN FILTER ENGINE ========= */
+  /* ===== FETCH + MERGE DATA ===== */
+  useEffect(() => {
+    const stored =
+      JSON.parse(localStorage.getItem("properties")) || [];
 
+    const formattedStored = stored.map((p) => ({
+      ...p,
+      coords: [parseFloat(p.lat), parseFloat(p.lng)],
+      totalPrice: Number(p.totalPrice),
+      image: p.images?.[0] || "https://via.placeholder.com/400",
+    }));
+
+    // 🔥 MERGE DEMO + STORED
+    const allProperties = [...demoProperties, ...formattedStored];
+
+    setProperties(allProperties);
+    setFiltered(allProperties);
+  }, []);
+
+  /* ========= FILTER ENGINE ========= */
   const handleFilterChange = (filters) => {
-    let result = [...propertiesData];
+    let result = [...properties];
 
-    // Location filter
     if (filters.location) {
       result = result.filter((p) =>
-        p.location.toLowerCase().includes(filters.location.toLowerCase())
+        p.city
+          ?.toLowerCase()
+          .includes(filters.location.toLowerCase())
       );
       setSelectedCity(filters.location);
     }
 
-    // Price filter
     if (filters.price) {
       result = result.filter(
         (p) =>
-          p.priceNumber >= filters.price.min &&
-          p.priceNumber <= filters.price.max
+          p.totalPrice >= filters.price.min &&
+          p.totalPrice <= filters.price.max
       );
     }
 
-    // Property type filter
     if (filters.type) {
-      result = result.filter((p) => p.type === filters.type);
+      result = result.filter(
+        (p) => p.propertyType === filters.type
+      );
     }
 
     setFiltered(result);
   };
 
-  /* ===== Marker Click Filter ===== */
   const handleMarkerClick = (city) => {
-    const result = propertiesData.filter(
-      (p) => p.location === city
+    const result = properties.filter(
+      (p) => p.city === city
     );
     setFiltered(result);
     setSelectedCity(city);
   };
 
   const resetFilter = () => {
-    setFiltered(propertiesData);
+    setFiltered(properties);
     setSelectedCity("");
   };
 
   return (
     <div className="h-[calc(100vh-80px)] flex flex-col">
 
-      {/*  FILTER BAR */}
       <BuyTopBar onFilterChange={handleFilterChange} />
 
       <div className="flex flex-1 overflow-hidden">
 
-        {/* ================= MAP ================= */}
+        {/* MAP */}
         <div className="w-1/2 hidden lg:block">
           <MapContainer
             center={[22.7, 71.5]}
@@ -140,52 +140,54 @@ const Buy = () => {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
-            {propertiesData.map((p) => (
-              <Marker
-                key={p.id}
-                position={p.coords}
-                eventHandlers={{
-                  click: () => handleMarkerClick(p.location),
-                }}
-              >
-                <Popup>
-                  <b>{p.title}</b>
-                  <br />
-                  {p.location}, Gujarat
-                </Popup>
-              </Marker>
-            ))}
+            {properties.map(
+              (p) =>
+                p.coords && (
+                  <Marker
+                    key={p.id}
+                    position={p.coords}
+                    eventHandlers={{
+                      click: () =>
+                        handleMarkerClick(p.city),
+                    }}
+                  >
+                    <Popup>
+                      <b>{p.propertyType}</b>
+                      <br />
+                      {p.city}, Gujarat
+                    </Popup>
+                  </Marker>
+                )
+            )}
           </MapContainer>
         </div>
 
-        {/* ================= LISTINGS ================= */}
+        {/* LISTINGS */}
         <div className="w-full lg:w-1/2 overflow-y-auto bg-gray-50 p-6">
 
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">
               {selectedCity
-                ? `${selectedCity} Land Listings`
-                : "Gujarat Land Listings"}
+                ? `${selectedCity} Listings`
+                : "Gujarat Listings"}
             </h2>
 
             {selectedCity && (
               <button
                 onClick={resetFilter}
-                className="text-sm bg-black text-white px-3 py-1 rounded"
+                className="text-sm bg-black text-white px-3 py-1 rounded cursor-pointer"
               >
                 Show All
               </button>
             )}
           </div>
 
-          {/* NO RESULT MESSAGE */}
           {filtered.length === 0 && (
             <p className="text-center text-gray-500 mt-20">
-              No properties found for selected filters
+              No properties found
             </p>
           )}
 
-          {/*  GRID */}
           <div className="grid md:grid-cols-2 gap-6">
 
             {filtered.map((p) => (
@@ -201,31 +203,26 @@ const Buy = () => {
 
                 <div className="p-5">
                   <h3 className="font-semibold text-lg">
-                    {p.title}
+                    {p.propertyType}
                   </h3>
 
                   <p className="text-sm text-gray-500">
-                    {p.location}, Gujarat
+                    {p.city}, {p.district}
                   </p>
 
                   <p className="mt-2 font-bold text-xl text-gray-900">
-                    ₹ {p.pricePerUnit} / {p.unit}
-                  </p>
-
-                  <p className="mt-1 text-sm text-gray-600">
-                    Total:
-                    <span className="ml-2 bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">
-                      ₹ {p.totalPrice}
-                    </span>
+                    ₹ {p.totalPrice}
                   </p>
 
                   <p className="mt-1 text-sm text-gray-700">
-                    Area: <b>{p.area}</b> · Type <b>{p.type}</b>
+                    Area: <b>{p.area} {p.unit}</b>
                   </p>
 
                   <button
-                    onClick={() => navigate(`/property/${p.id}`)}
-                    className="mt-4 w-full bg-black text-white py-2 rounded-md hover:bg-emerald-600"
+                    onClick={() =>
+                      navigate(`/property/${p.id}`)
+                    }
+                    className="mt-4 w-full bg-black text-white py-2 rounded-md hover:bg-emerald-600 cursor-pointer"
                   >
                     View Details
                   </button>

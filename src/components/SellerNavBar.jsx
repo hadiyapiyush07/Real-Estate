@@ -15,28 +15,48 @@ const SellerNavBar = () => {
 
         {/* LEFT LINKS */}
         <div className="flex gap-6 items-center">
-          <Link to="/" className="font-semibold">Home</Link>
+          <Link 
+            to="/" 
+            className="font-semibold hover:text-emerald-600 cursor-pointer"
+          >
+            Home
+          </Link>
         </div>
 
         {/* CENTER LOGO */}
-        <div className="text-2xl font-bold">
-          <span className="text-emerald-600">ANAND CORPORATION</span>
+        <div 
+          onClick={() => navigate("/seller-dashboard")}
+          className="text-2xl font-bold text-emerald-600 cursor-pointer"
+        >
+          ANAND CORPORATION
         </div>
 
         {/* RIGHT PROFILE */}
         <div className="flex items-center gap-4">
-          <div className="bg-emerald-600 text-white w-8 h-8 rounded-full flex items-center justify-center">
-            {user?.email?.charAt(0).toUpperCase()}
+
+          {/* Profile Circle */}
+          <div className="bg-emerald-600 text-white w-9 h-9 rounded-full flex items-center justify-center font-semibold cursor-pointer">
+            {user?.name?.charAt(0).toUpperCase()}
           </div>
-          <span className="text-sm">
-            Hello, {user?.email?.split("@")[0]}
-          </span>
+
+          {/* User Info */}
+          <div className="text-sm">
+            <p className="font-medium">
+              Hello, {user?.name}
+            </p>
+            <p className="text-gray-500 text-xs">
+              {user?.email}
+            </p>
+          </div>
+
+          {/* Logout */}
           <button
             onClick={handleLogout}
-            className="text-red-500 text-sm"
+            className="text-red-500 text-sm hover:underline cursor-pointer"
           >
             Logout
           </button>
+
         </div>
       </div>
     </nav>

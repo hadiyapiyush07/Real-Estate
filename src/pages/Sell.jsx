@@ -40,7 +40,7 @@ const Sell = () => {
    <p className="mt-5 text-gray-200 text-lg whitespace-nowrap text-center flex justify-center">
   Discover seamless solutions to maximize your agricultural land’s value with{" "}
   <span className="font-semibold text-emerald-400 ml-1">
-    ANAND CORPORATION
+    ANAND CORPORATION limited
   </span>.
 </p>
 

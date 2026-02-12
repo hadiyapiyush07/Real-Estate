@@ -30,7 +30,7 @@ const Navbar = () => {
             <Link
               to="/login"
               className="px-4 py-2 rounded-md bg-black text-white text-sm font-medium hover:bg-emerald-600 transition"
-            >
+            > 
               Login
             </Link>
           </div>

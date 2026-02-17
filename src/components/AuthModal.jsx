@@ -18,6 +18,7 @@ const AuthModal = () => {
     email: "",
     phone: "",
     password: "",
+    confirmPassword: "",
     loginEmail: "",
     loginPassword: "",
   });
@@ -51,6 +52,12 @@ const AuthModal = () => {
       err.password = "Password is required";
     else if (form.password.length < 6)
       err.password = "Minimum 6 characters required";
+
+    if (!form.confirmPassword) {
+      err.confirmPassword = "Please confirm your password";
+    } else if (form.confirmPassword !== form.password) {
+      err.confirmPassword = "Passwords do not match";
+    }
 
     setErrors(err);
     return Object.keys(err).length === 0;
@@ -266,28 +273,43 @@ const AuthModal = () => {
     </div>
 
     {/* PASSWORD */}
-    <div>
-      <input
-        name="password"
-        type="password"
-        placeholder="Create password"
-        onChange={handleChange}
-        className="input"
-      />
-      {errors.password && (
-        <p className="text-red-500 text-xs">{errors.password}</p>
+    <div className="grid grid-cols-2 gap-4">
+            <div>
+              <input
+                name="password"
+                type="password"
+                placeholder="Password"
+                onChange={handleChange}
+                className="input"
+              />
+              {errors.password && (
+                <p className="text-red-500 text-xs">{errors.password}</p>
+              )}
+            </div>
+
+            {/* CONFIRM PASSWORD INPUT */}
+            <div>
+              <input
+                name="confirmPassword"
+                type="password"
+                placeholder="Confirm Password"
+                onChange={handleChange}
+                className="input"
+              />
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-xs">{errors.confirmPassword}</p>
+              )}
+            </div>
+          </div>
+
+          <button
+            onClick={handleSignup}
+            className="w-full bg-emerald-600 text-white py-3 rounded-md hover:bg-emerald-700"
+          >
+            Create Account
+          </button>
+        </div>
       )}
-    </div>
-
-    <button
-      onClick={handleSignup}
-      className="w-full bg-emerald-600 text-white py-3 rounded-md hover:bg-emerald-700"
-    >
-      Create Account
-    </button>
-  </div>
-)}
-
     </motion.div>
   );
 };

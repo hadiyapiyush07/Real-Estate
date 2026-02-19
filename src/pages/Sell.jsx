@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Lock } from "lucide-react";
+import { Flag, Lock } from "lucide-react";
 
 const Sell = () => {
   const navigate = useNavigate();
@@ -52,7 +52,7 @@ const Sell = () => {
 
       {/* ================= LOGIN / FORM SECTION ================= */}
       <section className="py-24 bg-gradient-to-b from-gray-100 to-white flex justify-center">
-
+          
         {!isLoggedIn ? (
           /* LOGIN REQUIRED */
           <motion.div

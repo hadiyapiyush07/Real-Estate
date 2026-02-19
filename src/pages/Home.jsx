@@ -1,5 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import HomeHero from "./HomeHero";
+import PopularLocations from "./Popularlocation";
+
+
+
+
 
 const gujaratCities = [
   "Ahmedabad",
@@ -124,6 +130,9 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      <HomeHero/>
+      <PopularLocations/>
 
       {/* ================= FEATURED LISTINGS ================= */}
       <section className="py-20 bg-gray-50">

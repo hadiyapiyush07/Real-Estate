@@ -56,7 +56,6 @@ const AuthModal = () => {
     return Object.keys(err).length === 0;
   };
 
-  /* ✅ UPDATED SIGN IN VALIDATION (MIN 8 CHAR PASSWORD) */
   const validateSignin = () => {
     let err = {};
 
@@ -67,8 +66,8 @@ const AuthModal = () => {
 
     if (!form.loginPassword)
       err.loginPassword = "Password is required";
-    else if (form.loginPassword.length < 8)
-      err.loginPassword = "Password must be at least 8 characters";
+    else if (form.loginPassword.length < 6)
+      err.loginPassword = "Password must be at least 6 characters";
 
     setErrors(err);
     return Object.keys(err).length === 0;
@@ -79,9 +78,21 @@ const AuthModal = () => {
   const handleSignup = () => {
     if (!validateSignup()) return;
 
-    alert("Account created successfully ✅");
+    const userData = {
+      firstName: form.firstName,
+      lastName: form.lastName,
+      email: form.email,
+      phone: form.phone,
+      password: form.password,
+      role: role,
+      image: image,
+    };
 
+    // Save user credentials + role
+    localStorage.setItem("user", JSON.stringify(userData));
     localStorage.setItem("userRole", role);
+
+    alert("Account created successfully ✅");
 
     setTimeout(() => {
       if (role === "seller") {
@@ -95,17 +106,34 @@ const AuthModal = () => {
   const handleSignin = () => {
     if (!validateSignin()) return;
 
-    alert("Logged in successfully ✅");
+    const savedUser = JSON.parse(localStorage.getItem("user"));
 
-    const savedRole = localStorage.getItem("userRole") || "buyer";
+    // Check if user exists
+    if (!savedUser) {
+      alert("No account found. Please sign up first.");
+      return;
+    }
 
-    setTimeout(() => {
-      if (savedRole === "seller") {
-        navigate("/seller/add-property");
-      } else {
-        navigate("/");
-      }
-    }, 500);
+    // Check credentials
+    if (
+      savedUser.email === form.loginEmail &&
+      savedUser.password === form.loginPassword
+    ) {
+      alert("Logged in successfully ✅");
+
+      // Set role from saved user
+      localStorage.setItem("userRole", savedUser.role);
+
+      setTimeout(() => {
+        if (savedUser.role === "seller") {
+          navigate("/seller/add-property");
+        } else {
+          navigate("/");
+        }
+      }, 500);
+    } else {
+      alert("Invalid email or password ❌");
+    }
   };
 
   return (
@@ -190,7 +218,6 @@ const AuthModal = () => {
       {/* ================= SIGN UP ================= */}
       {tab === "signup" && (
         <div className="space-y-4">
-
           {/* PHOTO + ROLE */}
           <div className="flex flex-col items-center gap-4">
             <label className="cursor-pointer">
@@ -296,7 +323,7 @@ const AuthModal = () => {
 
           <button
             onClick={handleSignup}
-            className="w-full bg-emerald-600 text-white py-3 rounded-md hover:bg-emerald-700"
+            className="w-full bg-emerald-600 text-white py-3 rounded-md hover:bg-emerald-700 cursor-pointer"
           >
             Create Account
           </button>

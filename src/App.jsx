@@ -12,10 +12,19 @@ import BookMeeting from "./pages/BookMeeting";
 import PropertyDetails from "./pages/PropertyDetails";
 import AreaConverter from "./pages/AreaConverter";
 
+/* NEW IMPORTS */
+import SellerDashboard from "./pages/SellerDashboard";
+import AddProperty from "./components/AddProperty";
+import MyProperties from "./components/MyProperties";
+
 function App() {
   const location = useLocation();
 
-  const hideLayout = location.pathname.startsWith("/property");
+  const hideLayout =
+    location.pathname.startsWith("/property") ||
+    location.pathname.startsWith("/seller");
+
+  const hideFooterOnBuy = location.pathname.startsWith("/buy");
 
   return (
     <>
@@ -31,9 +40,15 @@ function App() {
         <Route path="/meeting" element={<BookMeeting />} />
         <Route path="/property/:id" element={<PropertyDetails />} />
         <Route path="/area-converter" element={<AreaConverter />} />
+
+        {/* SELLER ROUTES */}
+        <Route path="/seller" element={<SellerDashboard />}>
+          <Route path="add-property" element={<AddProperty />} />
+          <Route path="my-properties" element={<MyProperties />} />
+        </Route>
       </Routes>
 
-      {!hideLayout && <Footer />}
+      {!hideLayout && !hideFooterOnBuy && <Footer />}
     </>
   );
 }

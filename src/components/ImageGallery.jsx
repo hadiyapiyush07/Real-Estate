@@ -31,7 +31,7 @@ const galleryData = [
 const ImageGallery = ({ onChange }) => {
   const [current, setCurrent] = useState(0);
 
-  // 🔥 THIS IS THE FIX (page load pe data bhejna)
+  //  THIS IS THE FIX (page load pe data bhejna)
   useEffect(() => {
     onChange(galleryData[0]);
   }, []);

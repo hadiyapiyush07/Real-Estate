@@ -63,6 +63,7 @@ const AuthModal = () => {
     return Object.keys(err).length === 0;
   };
 
+  /* ✅ UPDATED SIGN IN VALIDATION (MIN 8 CHAR PASSWORD) */
   const validateSignin = () => {
     let err = {};
 
@@ -73,6 +74,8 @@ const AuthModal = () => {
 
     if (!form.loginPassword)
       err.loginPassword = "Password is required";
+    else if (form.loginPassword.length < 8)
+      err.loginPassword = "Password must be at least 8 characters";
 
     setErrors(err);
     return Object.keys(err).length === 0;
@@ -85,9 +88,15 @@ const AuthModal = () => {
 
     alert("Account created successfully ✅");
 
+    localStorage.setItem("userRole", role);
+
     setTimeout(() => {
-      window.location.reload();
-    }, 800);
+      if (role === "seller") {
+        navigate("/seller/add-property");
+      } else {
+        navigate("/");
+      }
+    }, 500);
   };
 
   const handleSignin = () => {
@@ -95,9 +104,15 @@ const AuthModal = () => {
 
     alert("Logged in successfully ✅");
 
+    const savedRole = localStorage.getItem("userRole") || "buyer";
+
     setTimeout(() => {
-      window.location.reload();
-    }, 800);
+      if (savedRole === "seller") {
+        navigate("/seller/add-property");
+      } else {
+        navigate("/");
+      }
+    }, 500);
   };
 
   return (
@@ -122,7 +137,7 @@ const AuthModal = () => {
       <div className="flex border-b mb-6">
         <button
           onClick={() => setTab("signin")}
-          className={`flex-1 pb-2 ${
+          className={`cursor-pointer flex-1 pb-2 ${
             tab === "signin"
               ? "border-b-2 border-emerald-600 text-emerald-600"
               : "text-gray-400"
@@ -132,7 +147,7 @@ const AuthModal = () => {
         </button>
         <button
           onClick={() => setTab("signup")}
-          className={`flex-1 pb-2 ${
+          className={`cursor-pointer flex-1 pb-2 ${
             tab === "signup"
               ? "border-b-2 border-emerald-600 text-emerald-600"
               : "text-gray-400"
@@ -172,7 +187,7 @@ const AuthModal = () => {
 
           <button
             onClick={handleSignin}
-            className="w-full bg-emerald-600 text-white py-3 rounded-md hover:bg-emerald-700"
+            className="w-full bg-emerald-600 text-white py-3 rounded-md hover:bg-emerald-700 cursor-pointer"
           >
             Sign In
           </button>
@@ -180,97 +195,97 @@ const AuthModal = () => {
       )}
 
       {/* ================= SIGN UP ================= */}
-{tab === "signup" && (
-  <div className="space-y-4">
+      {tab === "signup" && (
+        <div className="space-y-4">
 
-    {/* PHOTO + ROLE */}
-    <div className="flex flex-col items-center gap-4">
-      <label className="cursor-pointer">
-        <div className="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
-          {image ? (
-            <img src={image} className="h-full w-full object-cover" />
-          ) : (
-            <span className="text-xs text-gray-500">Upload</span>
-          )}
-        </div>
-        <input
-          type="file"
-          hidden
-          onChange={(e) =>
-            setImage(URL.createObjectURL(e.target.files[0]))
-          }
-        />
-      </label>
+          {/* PHOTO + ROLE */}
+          <div className="flex flex-col items-center gap-4">
+            <label className="cursor-pointer">
+              <div className="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+                {image ? (
+                  <img src={image} className="h-full w-full object-cover" />
+                ) : (
+                  <span className="text-xs text-gray-500">Upload</span>
+                )}
+              </div>
+              <input
+                type="file"
+                hidden
+                onChange={(e) =>
+                  setImage(URL.createObjectURL(e.target.files[0]))
+                }
+              />
+            </label>
 
-      <div className="flex gap-4">
-        {["buyer", "seller"].map((r) => (
-          <button
-            key={r}
-            onClick={() => setRole(r)}
-            className={`px-6 py-2 rounded-md border transition ${
-              role === r
-                ? "bg-emerald-600 text-white"
-                : "text-gray-600"
-            }`}
-          >
-            {r.toUpperCase()}
-          </button>
-        ))}
-      </div>
-    </div>
+            <div className="flex gap-4">
+              {["buyer", "seller"].map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setRole(r)}
+                  className={`px-6 py-2 rounded-md border transition ${
+                    role === r
+                      ? "bg-emerald-600 text-white cursor-pointer"
+                      : "text-gray-600 cursor-pointer"
+                  }`}
+                >
+                  {r.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          </div>
 
-    {/* FIRST + LAST NAME */}
-    <div className="grid grid-cols-2 gap-4">
-      <div>
-        <input
-          name="firstName"
-          placeholder="First Name"
-          onChange={handleChange}
-          className="input"
-        />
-        {errors.firstName && (
-          <p className="text-red-500 text-xs">{errors.firstName}</p>
-        )}
-      </div>
+          {/* FIRST + LAST */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <input
+                name="firstName"
+                placeholder="First Name"
+                onChange={handleChange}
+                className="input"
+              />
+              {errors.firstName && (
+                <p className="text-red-500 text-xs">{errors.firstName}</p>
+              )}
+            </div>
 
-      <div>
-        <input
-          name="lastName"
-          placeholder="Last Name"
-          onChange={handleChange}
-          className="input"
-        />
-        {errors.lastName && (
-          <p className="text-red-500 text-xs">{errors.lastName}</p>
-        )}
-      </div>
-    </div>
+            <div>
+              <input
+                name="lastName"
+                placeholder="Last Name"
+                onChange={handleChange}
+                className="input"
+              />
+              {errors.lastName && (
+                <p className="text-red-500 text-xs">{errors.lastName}</p>
+              )}
+            </div>
+          </div>
 
-    {/* EMAIL */}
-    <div>
-      <input
-        name="email"
-        placeholder="Email"
-        onChange={handleChange}
-        className="input"
-      />
-      {errors.email && (
-        <p className="text-red-500 text-xs">{errors.email}</p>
-      )}
-    </div>
+          {/* EMAIL */}
+          <div>
+            <input
+              name="email"
+              placeholder="Email"
+              onChange={handleChange}
+              className="input"
+            />
+            {errors.email && (
+              <p className="text-red-500 text-xs">{errors.email}</p>
+            )}
+          </div>
 
-    {/* PHONE */}
-    <div>
-      <input
-        name="phone"
-        placeholder="Phone Number"
-        onChange={handleChange}
-        className="input"
-      />
-      {errors.phone && (
-        <p className="text-red-500 text-xs">{errors.phone}</p>
-      )}
-    </div>
+          {/* PHONE */}
+          <div>
+            <input
+              name="phone"
+              placeholder="Phone Number"
+              onChange={handleChange}
+              className="input"
+            />
+            {errors.phone && (
+              <p className="text-red-500 text-xs">{errors.phone}</p>
+            )}
+          </div>
 
     {/* PASSWORD */}
     <div className="grid grid-cols-2 gap-4">
@@ -302,6 +317,14 @@ const AuthModal = () => {
             </div>
           </div>
 
+          <button
+            onClick={handleSignup}
+            className="w-full bg-emerald-600 text-white py-3 rounded-md hover:bg-emerald-700"
+          >
+            Create Account
+          </button>
+        </div>
+      )}
           <button
             onClick={handleSignup}
             className="w-full bg-emerald-600 text-white py-3 rounded-md hover:bg-emerald-700"

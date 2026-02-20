@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
+import axios from "axios";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -73,7 +74,7 @@ const AuthModal = () => {
 
     if (!form.loginPassword)
       err.loginPassword = "Password is required";
-    else if (form.loginPassword.length < 8)
+    else if (form.loginPassword.length < 6)
       err.loginPassword = "Password must be at least 8 characters";
 
     setErrors(err);
@@ -98,21 +99,38 @@ const AuthModal = () => {
     }, 500);
   };
 
-  const handleSignin = () => {
-    if (!validateSignin()) return;
+  const handleSignin = async () => {
+  if (!validateSignin()) return;
 
-    alert("Logged in successfully ✅");
+  try {
+    const response = await axios.post("http://localhost:5000/api/users/login", {
+      email: form.loginEmail,
+      password: form.loginPassword,
+    });
 
-    const savedRole = localStorage.getItem("userRole") || "buyer";
+    if (response.status === 200) {
+      const { token, user } = response.data;
 
-    setTimeout(() => {
-      if (savedRole === "seller") {
-        navigate("/seller/add-property");
+      // Store token and user data (e.g., in localStorage)
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      alert("Logged in successfully ✅");
+
+      // Redirect based on role
+      if (user.role === "buyer") {
+        navigate("/buy");
+      } else if (user.role === "seller") {
+        navigate("/sell");
       } else {
-        navigate("/");
+        navigate("/"); // Fallback
       }
-    }, 500);
-  };
+    }
+  } catch (error) {
+    const errorMsg = error.response?.data?.message || "Login failed.";
+    alert(errorMsg);
+  }
+};
 
   return (
     <motion.div

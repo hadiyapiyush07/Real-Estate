@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
+import axios from "axios";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -110,38 +111,38 @@ const AuthModal = () => {
     }, 500);
   };
 
-  const handleSignin = () => {
-    if (!validateSignin()) return;
+  const handleSignin = async () => {
+  if (!validateSignin()) return;
 
-    const savedUser = JSON.parse(localStorage.getItem("user"));
+  try {
+    const response = await axios.post("http://localhost:5000/api/users/login", {
+      email: form.loginEmail,
+      password: form.loginPassword,
+    });
 
-    // Check if user exists
-    if (!savedUser) {
-      alert("No account found. Please sign up first.");
-      return;
-    }
+    if (response.status === 200) {
+      const { token, user } = response.data;
 
-    // Check credentials
-    if (
-      savedUser.email === form.loginEmail &&
-      savedUser.password === form.loginPassword
-    ) {
+      // Store token and user data (e.g., in localStorage)
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
       alert("Logged in successfully ✅");
 
-      // Set role from saved user
-      localStorage.setItem("userRole", savedUser.role);
-
-      setTimeout(() => {
-        if (savedUser.role === "seller") {
-          navigate("/seller/add-property");
-        } else {
-          navigate("/");
-        }
-      }, 500);
-    } else {
-      alert("Invalid email or password ❌");
+      // Redirect based on role
+      if (user.role === "buyer") {
+        navigate("/buy");
+      } else if (user.role === "seller") {
+        navigate("/sell");
+      } else {
+        navigate("/"); // Fallback
+      }
     }
-  };
+  } catch (error) {
+    const errorMsg = error.response?.data?.message || "Login failed.";
+    alert(errorMsg);
+  }
+};
 
   return (
     <motion.div

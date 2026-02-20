@@ -75,7 +75,7 @@ const AuthModal = () => {
     if (!form.loginPassword)
       err.loginPassword = "Password is required";
     else if (form.loginPassword.length < 6)
-      err.loginPassword = "Password must be at least 8 characters";
+      err.loginPassword = "Password must be at least 6 characters";
 
     setErrors(err);
     return Object.keys(err).length === 0;
@@ -86,9 +86,21 @@ const AuthModal = () => {
   const handleSignup = () => {
     if (!validateSignup()) return;
 
-    alert("Account created successfully ✅");
+    const userData = {
+      firstName: form.firstName,
+      lastName: form.lastName,
+      email: form.email,
+      phone: form.phone,
+      password: form.password,
+      role: role,
+      image: image,
+    };
 
+    // Save user credentials + role
+    localStorage.setItem("user", JSON.stringify(userData));
     localStorage.setItem("userRole", role);
+
+    alert("Account created successfully ✅");
 
     setTimeout(() => {
       if (role === "seller") {

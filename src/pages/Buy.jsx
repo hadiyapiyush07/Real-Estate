@@ -189,49 +189,88 @@ const Buy = () => {
           )}
 
           <div className="grid md:grid-cols-2 gap-6">
+  {filtered.map((p) => {
+    // Calculate price per unit (auto)
+    const pricePerUnit =
+      p.pricePerUnit && p.area
+        ? Number(p.pricePerUnit)
+        : p.totalPrice && p.area
+        ? Math.round(Number(p.totalPrice) / Number(p.area))
+        : 0;
 
-            {filtered.map((p) => (
-              <div
-                key={p.id}
-                className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
-              >
-                <img
-                  src={p.image}
-                  className="h-40 w-full object-cover"
-                  alt=""
-                />
+    const totalPrice = Number(p.totalPrice) || 0;
+    const unit = p.unit || "Bigha";
 
-                <div className="p-5">
-                  <h3 className="font-semibold text-lg">
-                    {p.propertyType}
-                  </h3>
+    const formatPrice = (num) => {
+      if (!num) return "0";
+      if (num >= 10000000) return (num / 10000000).toFixed(2) + " Cr";
+      if (num >= 100000) return (num / 100000).toFixed(2) + " Lakh";
+      return num.toLocaleString("en-IN");
+    };
 
-                  <p className="text-sm text-gray-500">
-                    {p.city}, {p.district}
-                  </p>
+    return (
+      <div
+        key={p.id}
+        className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition"
+      >
+        {/* IMAGE BANNER (LIKE REFERENCE) */}
+        <div className="relative">
+          <img
+            src={p.image}
+            className="h-48 w-full object-cover"
+            alt="property"
+          />      
+        </div>
 
-                  <p className="mt-2 font-bold text-xl text-gray-900">
-                    ₹ {p.totalPrice}
-                  </p>
-
-                  <p className="mt-1 text-sm text-gray-700">
-                    Area: <b>{p.area} {p.unit}</b>
-                  </p>
-
-                  <button
-                    onClick={() =>
-                      navigate(`/property/${p.id}`)
-                    }
-                    className="mt-4 w-full bg-black text-white py-2 rounded-md hover:bg-emerald-600 cursor-pointer"
-                  >
-                    View Details
-                  </button>
-
-                </div>
-              </div>
-            ))}
+        {/* CARD CONTENT */}
+        <div className="p-4 space-y-2">
+          {/* PRICE PER UNIT (MAIN BIG TEXT) */}
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold text-gray-900">
+              ₹ {formatPrice(pricePerUnit)} / {unit}
+            </h2>
 
           </div>
+
+          {/* TOTAL PRICE BADGE (GREEN) */}
+          <div className="flex items-center gap-2">
+            <span className="text-gray-600 text-sm">Total:</span>
+            <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-semibold">
+              ₹ {formatPrice(totalPrice)}
+            </span>
+          </div>
+
+          {/* AREA + TYPE */}
+          <p className="text-sm text-gray-700">
+            Area:{" "}
+            <span className="font-semibold">
+              {p.area} {unit.toUpperCase()}
+            </span>
+            {" • "}
+            Type{" "}
+            <span className="font-semibold">
+              {p.propertyType}
+            </span>
+          </p>
+
+          {/* LOCATION */}
+          <p className="text-sm text-gray-500">
+            {p.district}, Gujarat
+          </p>
+
+          {/* VIEW DETAILS BUTTON (UNCHANGED NAVIGATION) */}
+          <button
+            onClick={() => navigate(`/property/${p.id}`)}
+            className="mt-3 w-full bg-black text-white py-2 rounded-lg hover:bg-emerald-600 cursor-pointer"
+          >
+            View Details
+          </button>
+        </div>
+      </div>
+    );
+  })}
+</div>
+
         </div>
       </div>
     </div>

@@ -26,8 +26,6 @@ const Footer = () => {
             <ul className="mt-4 space-y-3 text-sm text-gray-600">
               <li className="hover:text-emerald-600 cursor-pointer">Buy Land</li>
               <li className="hover:text-emerald-600 cursor-pointer">Sell Land</li>
-              <li className="hover:text-emerald-600 cursor-pointer">Farms</li>
-              <li className="hover:text-emerald-600 cursor-pointer">Investments</li>
             </ul>
           </div>
 
@@ -39,12 +37,6 @@ const Footer = () => {
             <ul className="mt-4 space-y-3 text-sm text-gray-600">
               <li className="hover:text-emerald-600 cursor-pointer">
                 Area Converter
-              </li>
-              <li className="hover:text-emerald-600 cursor-pointer">
-                Property Valuation
-              </li>
-              <li className="hover:text-emerald-600 cursor-pointer">
-                Broker Assistance
               </li>
             </ul>
           </div>
@@ -79,9 +71,6 @@ const Footer = () => {
             © {new Date().getFullYear()} ANAND CORPORATION. All rights reserved.
           </p>
 
-          <p className="text-sm text-gray-500">
-            Har Pata Humein Pata Hai
-          </p>
         </div>
       </div>
     </footer>

@@ -1,12 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import heroImage from "../assets/hero-home.png";
+import heroImage from "../assets/phone.jpg";
 
 const HomeHero = () => {
   const navigate = useNavigate();
 
   return (
     <section className="w-full mt-6 px-6 md:px-10">
-      {/* This controls the width (slightly wider but not edge-to-edge) */}
       <div className="w-full max-w-[1500px] mx-auto bg-gradient-to-b from-gray-50 to-gray-50 rounded-3xl py-16 md:py-20 flex items-center justify-between gap-10">
         
         {/* LEFT CONTENT */}
@@ -29,12 +28,12 @@ const HomeHero = () => {
           </button>
         </div>
 
-        {/* RIGHT IMAGE (unchanged style) */}
+        {/* RIGHT IMAGE - SMALLER */}
         <div className="pr-8 md:pr-14">
           <img
             src={heroImage}
             alt="Map Preview"
-            className="w-[320px] md:w-[400px] lg:w-[460px]"
+            className="w-[160px] md:w-[220px] lg:w-[260px] rounded-2xl shadow-lg"
           />
         </div>
       </div>

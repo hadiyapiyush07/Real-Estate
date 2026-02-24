@@ -32,17 +32,17 @@ const Sell = () => {
             transition={{ duration: 0.6 }}
             className="max-w-xl"
           >
-            <h1 className="text-3xl md:text-5xl font-extrabold text-white whitespace-nowrap drop-shadow-lg justify-center flex">
-  SELL YOUR LAND WITH CONFIDENCE
-</h1>
+          <h1 className="text-3xl md:text-5xl font-extrabold text-white whitespace-nowrap drop-shadow-lg justify-center flex">
+            SELL YOUR LAND WITH CONFIDENCE
+          </h1>
 
 
-   <p className="mt-5 text-gray-200 text-lg whitespace-nowrap text-center flex justify-center">
-  Discover seamless solutions to maximize your agricultural land’s value with{" "}
-  <span className="font-semibold text-emerald-400 ml-1">
-    ANAND CORPORATION limited
-  </span>.
-</p>
+        <p className="mt-5 text-gray-200 text-lg whitespace-nowrap text-center flex justify-center">
+            Discover seamless solutions to maximize your agricultural land’s value with{" "}
+            <span className="font-semibold text-emerald-400 ml-1">
+              ANAND CORPORATION limited
+            </span>.
+        </p>
 
 
 

@@ -83,9 +83,11 @@ const AuthModal = () => {
 
   /* ================= SUBMIT ================= */
 
-  const handleSignup = () => {
-    if (!validateSignup()) return;
+  const handleSignup = async () => {
+  if (!validateSignup()) return;
 
+  try {
+    // Prepare data (you'll need to handle file upload separately)
     const userData = {
       firstName: form.firstName,
       lastName: form.lastName,
@@ -93,23 +95,25 @@ const AuthModal = () => {
       phone: form.phone,
       password: form.password,
       role: role,
-      image: image,
+      // profilePhoto: ...  // you need to upload the image first
     };
 
-    // Save user credentials + role
-    localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("userRole", role);
+    const response = await axios.post("http://localhost:5000/api/users/register", userData);
 
-    alert("Account created successfully ✅");
-
-    setTimeout(() => {
+    if (response.status === 201) {
+      alert("Account created successfully ✅");
+      // Optionally auto-login or redirect
       if (role === "seller") {
-        navigate("/seller/add-property");
+        navigate("/");
       } else {
         navigate("/");
       }
-    }, 500);
-  };
+    }
+  } catch (error) {
+    const errorMsg = error.response?.data?.message || "Signup failed.";
+    alert(errorMsg);
+  }
+};
 
   const handleSignin = async () => {
   if (!validateSignin()) return;
@@ -133,7 +137,7 @@ const AuthModal = () => {
       if (user.role === "buyer") {
         navigate("/buy");
       } else if (user.role === "seller") {
-        navigate("/sell");
+        navigate("/seller/add-property");
       } else {
         navigate("/"); // Fallback
       }

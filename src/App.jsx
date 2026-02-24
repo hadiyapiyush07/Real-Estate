@@ -46,6 +46,12 @@ function App() {
           <Route path="add-property" element={<AddProperty />} />
           <Route path="my-properties" element={<MyProperties />} />
         </Route>
+
+        {/* <Route path="/Buyer" element={<BuyerDashboard />} >
+          <Route path="my-meetings" element={<MyMeetings />} />
+
+        </Route>    */}
+
       </Routes>
 
       {!hideLayout && !hideFooterOnBuy && <Footer />}

@@ -2,8 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
-import axios from "axios";
-
+import api from "../config/axios";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const AuthModal = () => {
@@ -12,6 +11,8 @@ const AuthModal = () => {
   const [tab, setTab] = useState("signup");
   const [role, setRole] = useState("buyer");
   const [image, setImage] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
 
   const [form, setForm] = useState({
     firstName: "",
@@ -83,66 +84,97 @@ const AuthModal = () => {
 
   /* ================= SUBMIT ================= */
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
     if (!validateSignup()) return;
 
-    const userData = {
-      firstName: form.firstName,
-      lastName: form.lastName,
-      email: form.email,
-      phone: form.phone,
-      password: form.password,
-      role: role,
-      image: image,
-    };
+    setIsLoading(true);
 
-    // Save user credentials + role
-    localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("userRole", role);
-
-    alert("Account created successfully ✅");
-
-    setTimeout(() => {
-      if (role === "seller") {
-        navigate("/seller/add-property");
-      } else {
-        navigate("/");
+    try {
+      // Create FormData for handling file upload
+      const formData = new FormData();
+      formData.append("firstName", form.firstName);
+      formData.append("lastName", form.lastName);
+      formData.append("email", form.email);
+      formData.append("phone", form.phone);
+      formData.append("password", form.password);
+      formData.append("role", role);
+      if (imageFile) {
+        formData.append("profilePhoto", imageFile);
       }
-    }, 500);
+
+      const response = await api.post("/users/register", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+
+        },
+      });
+
+      if (response.status === 201) {
+        const { token, user } = response.data;
+
+        // Store token and user data
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("userRole", user.role);
+
+        alert("Account created successfully ✅");
+
+        setTimeout(() => {
+          if (user.role === "seller") {
+            navigate("/seller/add-property");
+          } else {
+            navigate("/login");
+          }
+        }, 500);
+      }
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || "Registration failed. Please try again.";
+      alert(errorMsg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSignin = async () => {
-  if (!validateSignin()) return;
+    if (!validateSignin()) return;
 
-  try {
-    const response = await axios.post("http://localhost:5000/api/users/login", {
-      email: form.loginEmail,
-      password: form.loginPassword,
-    });
+    setIsLoading(true);
 
-    if (response.status === 200) {
-      const { token, user } = response.data;
+    try {
+      const response = await api.post("/users/login", {
+        email: form.loginEmail,
+        password: form.loginPassword,
+      });
 
-      // Store token and user data (e.g., in localStorage)
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
+      if (response.status === 200) {
+        const { token, user } = response.data;
 
-      alert("Logged in successfully ✅");
+        // Store token and user data
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("userRole", user.role);
 
-      // Redirect based on role
-      if (user.role === "buyer") {
-        navigate("/buy");
-      } else if (user.role === "seller") {
-        navigate("/sell");
-      } else {
-        navigate("/"); // Fallback
+        localStorage.setItem("isLoggedIn", "true");
+
+
+        alert("Logged in successfully ✅");
+
+        // Redirect based on role
+        if (user.role === "buyer") {
+          navigate("/buy");
+        } else if (user.role === "seller") {
+          navigate("/sell");
+        } else {
+          navigate("/"); // Fallback
+        }
       }
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || "Login failed.";
+      alert(errorMsg);
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    const errorMsg = error.response?.data?.message || "Login failed.";
-    alert(errorMsg);
-  }
-};
+  };
 
   return (
     <motion.div
@@ -166,21 +198,19 @@ const AuthModal = () => {
       <div className="flex border-b mb-6">
         <button
           onClick={() => setTab("signin")}
-          className={`cursor-pointer flex-1 pb-2 ${
-            tab === "signin"
-              ? "border-b-2 border-emerald-600 text-emerald-600"
-              : "text-gray-400"
-          }`}
+          className={`cursor-pointer flex-1 pb-2 ${tab === "signin"
+            ? "border-b-2 border-emerald-600 text-emerald-600"
+            : "text-gray-400"
+            }`}
         >
           Sign In
         </button>
         <button
           onClick={() => setTab("signup")}
-          className={`cursor-pointer flex-1 pb-2 ${
-            tab === "signup"
-              ? "border-b-2 border-emerald-600 text-emerald-600"
-              : "text-gray-400"
-          }`}
+          className={`cursor-pointer flex-1 pb-2 ${tab === "signup"
+            ? "border-b-2 border-emerald-600 text-emerald-600"
+            : "text-gray-400"
+            }`}
         >
           New Account
         </button>
@@ -192,6 +222,7 @@ const AuthModal = () => {
           <input
             name="loginEmail"
             placeholder="Email"
+            value={form.loginEmail}
             onChange={handleChange}
             className="input"
           />
@@ -203,6 +234,7 @@ const AuthModal = () => {
             name="loginPassword"
             type="password"
             placeholder="Password"
+            value={form.loginPassword}
             onChange={handleChange}
             className="input"
           />
@@ -216,9 +248,10 @@ const AuthModal = () => {
 
           <button
             onClick={handleSignin}
-            className="w-full bg-emerald-600 text-white py-3 rounded-md hover:bg-emerald-700 cursor-pointer"
+            disabled={isLoading}
+            className="w-full bg-emerald-600 text-white py-3 rounded-md hover:bg-emerald-700 cursor-pointer disabled:bg-emerald-300 disabled:cursor-not-allowed"
           >
-            Sign In
+            {isLoading ? "Signing in..." : "Sign In"}
           </button>
         </div>
       )}
@@ -242,7 +275,9 @@ const AuthModal = () => {
                 accept="image/*"
                 onChange={(e) => {
                   if (e.target.files[0]) {
-                    setImage(URL.createObjectURL(e.target.files[0]));
+                    const file = e.target.files[0];
+                    setImage(URL.createObjectURL(file)); // For preview
+                    setImageFile(file); // Store actual file for upload
                   }
                 }}
               />
@@ -254,11 +289,10 @@ const AuthModal = () => {
                   key={r}
                   type="button"
                   onClick={() => setRole(r)}
-                  className={`px-6 py-2 rounded-md border transition ${
-                    role === r
-                      ? "bg-emerald-600 text-white cursor-pointer"
-                      : "text-gray-600 cursor-pointer"
-                  }`}
+                  className={`px-6 py-2 rounded-md border transition ${role === r
+                    ? "bg-emerald-600 text-white cursor-pointer"
+                    : "text-gray-600 cursor-pointer"
+                    }`}
                 >
                   {r.toUpperCase()}
                 </button>
@@ -357,9 +391,10 @@ const AuthModal = () => {
 
           <button
             onClick={handleSignup}
-            className="w-full bg-emerald-600 text-white py-3 rounded-md hover:bg-emerald-700 cursor-pointer"
+            disabled={isLoading}
+            className="w-full bg-emerald-600 text-white py-3 rounded-md hover:bg-emerald-700 cursor-pointer disabled:bg-emerald-300 disabled:cursor-not-allowed"
           >
-            Create Account
+            {isLoading ? "Creating Account..." : "Create Account"}
           </button>
         </div>
       )}

@@ -1,17 +1,25 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Flag, Lock } from "lucide-react";
+import { useEffect } from "react"; // Add this import
 
 const Sell = () => {
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem("isLoggedIn");
+
+  // Redirect to AddProperty if logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/seller/add-property");
+    }
+  }, [isLoggedIn, navigate]);
 
   return (
     <div className="w-full">
 
       {/* ================= HERO WITH BACKGROUND IMAGE ================= */}
       <section className="relative min-h-[75vh] flex items-center">
-        
+
         {/* BACKGROUND IMAGE */}
         <div
           className="absolute inset-0 bg-cover bg-center"
@@ -33,18 +41,15 @@ const Sell = () => {
             className="max-w-xl"
           >
             <h1 className="text-3xl md:text-5xl font-extrabold text-white whitespace-nowrap drop-shadow-lg justify-center flex">
-  SELL YOUR LAND WITH CONFIDENCE
-</h1>
+              SELL YOUR LAND WITH CONFIDENCE
+            </h1>
 
-
-   <p className="mt-5 text-gray-200 text-lg whitespace-nowrap text-center flex justify-center">
-  Discover seamless solutions to maximize your agricultural land’s value with{" "}
-  <span className="font-semibold text-emerald-400 ml-1">
-    ANAND CORPORATION limited
-  </span>.
-</p>
-
-
+            <p className="mt-5 text-gray-200 text-lg whitespace-nowrap text-center flex justify-center">
+              Discover seamless solutions to maximize your agricultural land's value with{" "}
+              <span className="font-semibold text-emerald-400 ml-1">
+                ANAND CORPORATION limited
+              </span>.
+            </p>
 
           </motion.div>
         </div>
@@ -52,7 +57,7 @@ const Sell = () => {
 
       {/* ================= LOGIN / FORM SECTION ================= */}
       <section className="py-24 bg-gradient-to-b from-gray-100 to-white flex justify-center">
-          
+
         {!isLoggedIn ? (
           /* LOGIN REQUIRED */
           <motion.div
@@ -84,50 +89,23 @@ const Sell = () => {
             </button>
           </motion.div>
         ) : (
-          /* SELL FORM */
-          <motion.form
+          /* This will briefly show while redirecting */
+          <motion.div
             initial={{ y: 40, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             viewport={{ once: true }}
-            className="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-xl"
+            className="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-md text-center"
           >
-            <h2 className="text-2xl font-bold text-center">
-              List Your Land
+            <h2 className="text-2xl font-bold text-gray-900">
+              Redirecting...
             </h2>
-
-            <div className="mt-6">
-              <label className="text-sm font-medium">Location</label>
-              <input
-                className="mt-1 w-full border rounded-md px-4 py-3"
-                placeholder="Village, Taluka, District"
-              />
+            <p className="mt-4 text-gray-600">
+              Taking you to the property listing form.
+            </p>
+            <div className="mt-6 flex justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
             </div>
-
-            <div className="mt-4">
-              <label className="text-sm font-medium">Area (Bigha)</label>
-              <input
-                type="number"
-                className="mt-1 w-full border rounded-md px-4 py-3"
-              />
-            </div>
-
-            <div className="mt-4">
-              <label className="text-sm font-medium">Expected Price</label>
-              <input
-                className="mt-1 w-full border rounded-md px-4 py-3"
-                placeholder="₹ Total Price"
-              />
-            </div>
-
-            <div className="mt-4">
-              <label className="text-sm font-medium">Upload Images</label>
-              <input type="file" multiple className="mt-1 w-full" />
-            </div>
-
-            <button className="mt-8 w-full py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700">
-              Submit Property
-            </button>
-          </motion.form>
+          </motion.div>
         )}
 
       </section>

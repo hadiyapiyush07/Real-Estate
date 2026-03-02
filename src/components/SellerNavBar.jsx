@@ -26,7 +26,7 @@ const SellerNavBar = () => {
         {/* CENTER LOGO */}
         <div 
           onClick={() => navigate("/seller-dashboard")}
-          className="text-2xl font-bold text-emerald-600 cursor-pointer"
+          className="text-2xl font-bold cursor-pointer hover:text-emerald-700"
         >
           ANAND CORPORATION
         </div>

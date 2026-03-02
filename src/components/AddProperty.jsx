@@ -51,6 +51,7 @@ const AddProperty = () => {
 
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState({});
+  const [uploadError, setUploadError] = useState("");
 
   const [form, setForm] = useState(
     editProperty || {
@@ -87,6 +88,7 @@ const AddProperty = () => {
     });
   };
 
+  // ===== IMAGE UPLOAD =====
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
 
@@ -100,7 +102,7 @@ const AddProperty = () => {
     setForm({ ...form, images: [...form.images, ...newImages] });
   };
 
-  // Auto Total Price (LIVE)
+  // Auto Total Price
   const Totalprice =
     form.area && form.pricePerUnit
       ? (Number(form.pricePerUnit) * Number(form.area)).toFixed(2)
@@ -114,7 +116,7 @@ const AddProperty = () => {
       if (!form.district) newErrors.district = "Required";
       if (!form.area) newErrors.area = "Required";
       if (!form.unit) newErrors.unit = "Required";
-      if (!Totalprice) newErrors.totalPrice = "Required"; // fixed
+      if (!Totalprice) newErrors.totalPrice = "Required";
     }
 
     if (step === 2 && form.images.length === 0)
@@ -229,17 +231,22 @@ const AddProperty = () => {
         ))}
       </div>
 
-      {/* ================= STEP 1 ================= */}
+      {/* ================= STEP 1 (WITH ERROR MESSAGES) ================= */}
       {step === 1 && (
         <div className="space-y-8">
           <div className="grid grid-cols-2 gap-6">
 
-            <select name="propertyType" onChange={handleChange} className="input">
-              <option value="">Select Property Type</option>
-              <option>Agricultural</option>
-              <option>Farm</option>
-              <option>Plot</option>
-            </select>
+            <div>
+              <select name="propertyType" onChange={handleChange} className="input">
+                <option value="">Select Property Type</option>
+                <option>Agricultural</option>
+                <option>Farm</option>
+                <option>Plot</option>
+              </select>
+              {errors.propertyType && (
+                <p className="text-red-500 text-sm mt-1">{errors.propertyType}</p>
+              )}
+            </div>
 
             <select name="district" onChange={handleChange} className="input">
               <option value="">Select District (Gujarat)</option>
@@ -249,40 +256,59 @@ const AddProperty = () => {
             </select>
 
             <div className="flex gap-2">
-              <input
-                name="area"
-                placeholder="Area"
-                type="number"
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (/^\d*$/.test(value)) {
-                    handleChange(e);
-                  }
-                }}
-                className="input"
-              />
+              <div className="flex-1">
+                <input
+                  name="area"
+                  placeholder="Area"
+                  type="number"
+                  step="any"  // allows decimals
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Allow decimals (including empty)
+                    if (/^\d*\.?\d*$/.test(value) || value === "") {
+                      handleChange(e);
+                    }
+                  }}
+                  className="input"
+                />
+                {errors.area && (
+                  <p className="text-red-500 text-sm mt-1">{errors.area}</p>
+                )}
+              </div>
 
-              <select name="unit" onChange={handleChange} className="input w-40">
-                <option value="">Unit</option>
-                <option>Acre</option>
-                <option>Bigha</option>
-                <option>Sq.ft</option>
-              </select>
+              <div>
+                <select name="unit" onChange={handleChange} className="input w-40">
+                  <option value="">Unit</option>
+                  <option>Acre</option>
+                  <option>Bigha</option>
+                  <option>Sq.ft</option>
+                </select>
+                {errors.unit && (
+                  <p className="text-red-500 text-sm mt-1">{errors.unit}</p>
+                )}
+              </div>
             </div>
 
-            <input
-              name="pricePerUnit"
-              placeholder="Price per Unit(₹)"
-              onChange={handleChange}
-              className="input"
-            />
+            <div>
+              <input
+                name="pricePerUnit"
+                placeholder="Price per Unit (₹)"
+                onChange={handleChange}
+                className="input"
+              />
+            </div>
 
-            <input
-              value={Totalprice}
-              placeholder="Total Price (Auto)"
-              disabled
-              className="input bg-gray-100"
-            />
+            <div>
+              <input
+                value={Totalprice}
+                placeholder="Total Price (Auto)"
+                disabled
+                className="input bg-gray-100"
+              />
+              {errors.totalPrice && (
+                <p className="text-red-500 text-sm mt-1">{errors.totalPrice}</p>
+              )}
+            </div>
 
             <textarea
               name="description"
@@ -364,10 +390,77 @@ const AddProperty = () => {
         </div>
       )}
 
-      {/* ================= STEP 2 ================= */}
+      {/* ================= STEP 2 (REDESIGNED) ================= */}
       {step === 2 && (
-        <div>
-          <input type="file" multiple onChange={handleImageUpload} />
+        <div className="space-y-6">
+          <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-emerald-500 transition">
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              id="imageUpload"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+            <label
+              htmlFor="imageUpload"
+              className="cursor-pointer inline-flex flex-col items-center"
+            >
+              <svg
+                className="w-12 h-12 text-gray-400 mb-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              <span className="text-gray-600 font-medium">
+                Click to upload images
+              </span>
+              <span className="text-sm text-gray-500 mt-1">
+                (Max 6 images, up to 3MB each)
+              </span>
+            </label>
+          </div>
+
+          {uploadError && (
+            <div className="text-red-500 text-sm mt-2">{uploadError}</div>
+          )}
+          {errors.images && (
+            <div className="text-red-500 text-sm">{errors.images}</div>
+          )}
+
+          {form.images.length > 0 && (
+            <div className="mt-6">
+              <p className="text-sm font-medium text-gray-700 mb-3">
+                Uploaded Images ({form.images.length}/6)
+              </p>
+              <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
+                {form.images.map((img, idx) => (
+                  <div key={idx} className="relative group">
+                    <img
+                      src={img}
+                      alt={`Preview ${idx + 1}`}
+                      className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(idx)}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-lg"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -486,7 +579,8 @@ const AddProperty = () => {
         {step > 1 && (
           <button
             onClick={() => setStep(step - 1)}
-            className="bg-gray-200 px-6 py-2 rounded">
+            className="bg-gray-200 px-6 py-2 rounded"
+          >
             Back
           </button>
         )}
@@ -494,13 +588,15 @@ const AddProperty = () => {
         {step < 4 ? (
           <button
             onClick={handleNext}
-            className="bg-emerald-600 text-white px-6 py-2 rounded cursor-pointer">
+            className="bg-emerald-600 text-white px-6 py-2 rounded cursor-pointer"
+          >
             Next
           </button>
         ) : (
           <button
             onClick={handleSubmit}
-            className="bg-emerald-600 text-white px-6 py-2 rounded">
+            className="bg-emerald-600 text-white px-6 py-2 rounded"
+          >
             Submit Property
           </button>
         )}
@@ -510,5 +606,3 @@ const AddProperty = () => {
 };
 
 export default AddProperty;
-
-

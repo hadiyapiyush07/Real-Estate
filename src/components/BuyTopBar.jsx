@@ -1,16 +1,18 @@
 import { useState, useRef, useEffect } from "react";
 import { Search, ChevronDown } from "lucide-react";
 
-/* ========= DATA ========= */
-
+/* ========= FULL LOCATIONS (ALL CITIES & DISTRICTS OF GUJARAT) ========= */
 const LOCATIONS = [
-  "Ahmedabad",
-  "Surat",
-  "Rajkot",
-  "Vadodara",
-  "Anand",
-  "Gandhinagar",
-];
+  "Ahmedabad", "Surat", "Vadodara", "Rajkot", "Bhavnagar", "Jamnagar",
+  "Junagadh", "Gandhinagar", "Anand", "Nadiad", "Mehsana", "Bharuch",
+  "Navsari", "Bhuj", "Porbandar", "Palanpur", "Godhra", "Veraval",
+  "Modasa", "Amreli", "Botad", "Chhota Udaipur", "Dahod", "Ahwa",
+  "Khambhalia", "Lunavada", "Morbi", "Rajpipla", "Himmatnagar",
+  "Surendranagar", "Vyara", "Valsad", "Tharad", "Kutch", "Patan",
+  "Sabarkantha", "Tapi", "Aravalli", "Devbhoomi Dwarka", "Gir Somnath",
+  "Mahisagar", "Narmada", "Panchmahal", "Vav-Tharad",
+  "Banaskantha", "Kheda", "Dang"
+].sort();
 
 const PRICE_RANGES = [
   { label: "Any Price", min: 0, max: Infinity },

@@ -1,30 +1,65 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import HomeHero from "./HomeHero";
 import PopularLocations from "./Popularlocation";
 
-
-
-
-
-const gujaratCities = [
-  "Ahmedabad",
-  "Surat",
-  "Vadodara",
-  "Rajkot",
-  "Anand",
-  "Gandhinagar",
-  "Bhavnagar",
-  "Jamnagar",
-  "Junagadh",
-  "Mehsana",
+// Complete list of all cities and districts in Gujarat
+const allLocations = [
+  "Ahmedabad", "Surat", "Vadodara", "Rajkot", "Bhavnagar", "Jamnagar",
+  "Junagadh", "Gandhinagar", "Anand", "Nadiad", "Mehsana", "Bharuch",
+  "Navsari", "Bhuj", "Porbandar", "Palanpur", "Godhra", "Veraval",
+  "Modasa", "Amreli", "Botad", "Chhota Udaipur", "Dahod", "Ahwa",
+  "Khambhalia", "Lunavada", "Morbi", "Rajpipla", "Himmatnagar",
+  "Surendranagar", "Vyara", "Valsad", "Tharad", "Kutch", "Patan",
+  "Sabarkantha", "Tapi", "Aravalli", "Devbhoomi Dwarka", "Gir Somnath",
+  "Mahisagar", "Narmada", "Panchmahal", "Vav-Tharad",
+  "Banaskantha", "Kheda", "Dang"
 ];
+
+const uniqueLocations = [...new Set(allLocations)].sort();
 
 const Home = () => {
   const navigate = useNavigate();
-
-  const [query, setQuery] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchInput(value);
+
+    if (value.trim().length > 0) {
+      const filtered = uniqueLocations.filter((loc) =>
+        loc.toLowerCase().includes(value.toLowerCase())
+      );
+      setSuggestions(filtered);
+      setShowSuggestions(true);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSuggestionClick = (location) => {
+    setSearchInput(location);
+    setShowSuggestions(false);
+    // Removed navigation from here – only fills the input
+  };
+
+  const handleSearch = () => {
+    if (searchInput.trim()) {
+      navigate(`/buy?location=${encodeURIComponent(searchInput.trim())}`);
+    }
+  };
+
+  const handleBlur = () => {
+    setTimeout(() => setShowSuggestions(false), 200);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
 
   const properties = [
     {
@@ -50,31 +85,9 @@ const Home = () => {
     },
   ];
 
-  /* ================= SEARCH ================= */
-
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setQuery(value);
-
-    if (!value) {
-      setSuggestions([]);
-      return;
-    }
-
-    const filtered = gujaratCities.filter((city) =>
-      city.toLowerCase().includes(value.toLowerCase())
-    );
-    setSuggestions(filtered);
-  };
-
-  const handleSearch = () => {
-    if (!query) return;
-    navigate(`/buy?city=${query}`);
-  };
-
   return (
     <div className="w-full">
-      {/* ================= HERO ================= */}
+      {/* ================= HERO SECTION WITH SEARCH ================= */}
       <section className="relative h-[85vh] w-full">
         <img
           src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"
@@ -92,29 +105,28 @@ const Home = () => {
             Browse verified land listings posted directly by sellers.
           </p>
 
-          {/* SEARCH BOX */}
+          {/* SEARCH BOX WITH FULL LOCATION SUGGESTIONS */}
           <div className="mt-10 relative bg-white rounded-xl shadow-lg p-4 max-w-2xl flex gap-3">
             <div className="flex-1 relative">
               <input
-                value={query}
-                onChange={handleChange}
+                value={searchInput}
+                onChange={handleInputChange}
+                onFocus={() => searchInput && setShowSuggestions(true)}
+                onBlur={handleBlur}
+                onKeyDown={handleKeyDown}
                 placeholder="City, District or Village in Gujarat"
                 className="w-full px-4 py-3 outline-none"
               />
 
-              {suggestions.length > 0 && (
-                <div className="absolute top-14 left-0 w-full bg-white border rounded-md shadow z-20">
-                  {suggestions.map((city) => (
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute top-14 left-0 w-full bg-white border rounded-md shadow z-20 max-h-60 overflow-y-auto">
+                  {suggestions.map((loc, index) => (
                     <div
-                      key={city}
-                      onClick={() => {
-                        setQuery(city);
-                        setSuggestions([]);
-                        navigate(`/buy?city=${city}`);
-                      }}
+                      key={index}
+                      onMouseDown={() => handleSuggestionClick(loc)}
                       className="px-4 py-2 cursor-pointer hover:bg-gray-100"
                     >
-                      {city}, Gujarat
+                      {loc}, Gujarat
                     </div>
                   ))}
                 </div>
@@ -123,7 +135,7 @@ const Home = () => {
 
             <button
               onClick={handleSearch}
-              className="px-8 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+              className="px-8 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 cursor-pointer"
             >
               Search
             </button>
@@ -131,8 +143,8 @@ const Home = () => {
         </div>
       </section>
 
-      <HomeHero/>
-      <PopularLocations/>
+      {/* Popular Locations Cards */}
+      <PopularLocations />
 
       {/* ================= FEATURED LISTINGS ================= */}
       <section className="py-20 bg-gray-50">

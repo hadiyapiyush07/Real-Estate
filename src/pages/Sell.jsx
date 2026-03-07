@@ -1,26 +1,43 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Flag, Lock } from "lucide-react";
-import { useEffect } from "react"; // Add this import
+import { Flag, Lock, UserPlus } from "lucide-react";
+import { useEffect } from "react";
 
 const Sell = () => {
   const navigate = useNavigate();
-  const isLoggedIn = localStorage.getItem("isLoggedIn");
 
-  // Redirect to AddProperty if logged in
+  // Retrieve the full user object from localStorage
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  // Redirect only if the user is a seller
   useEffect(() => {
-    if (isLoggedIn) {
+    if (user?.role === "seller") {
       navigate("/seller/add-property");
     }
-  }, [isLoggedIn, navigate]);
+  }, [user, navigate]);
+
+  // If the user is a seller, we show nothing while redirecting
+  if (user?.role === "seller") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900">Redirecting...</h2>
+          <p className="mt-4 text-gray-600">
+            Taking you to the property listing form.
+          </p>
+          <div className="mt-6 flex justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
 
       {/* ================= HERO WITH BACKGROUND IMAGE ================= */}
       <section className="relative min-h-[75vh] flex items-center">
-
-        {/* BACKGROUND IMAGE */}
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
@@ -28,11 +45,8 @@ const Sell = () => {
               "url('https://images.pexels.com/photos/440731/pexels-photo-440731.jpeg')",
           }}
         />
-
-        {/* DARK OVERLAY */}
         <div className="absolute inset-0 bg-black/55" />
 
-        {/* CONTENT */}
         <div className="relative z-10 max-w-8xl mx-auto px-6">
           <motion.div
             initial={{ y: 40, opacity: 0 }}
@@ -50,16 +64,14 @@ const Sell = () => {
                 ANAND CORPORATION limited
               </span>.
             </p>
-
           </motion.div>
         </div>
       </section>
 
-      {/* ================= LOGIN / FORM SECTION ================= */}
+      {/* ================= MAIN CONTENT ================= */}
       <section className="py-24 bg-gradient-to-b from-gray-100 to-white flex justify-center">
 
-        {!isLoggedIn ? (
-          /* LOGIN REQUIRED */
+
           <motion.div
             initial={{ y: 40, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
@@ -71,7 +83,7 @@ const Sell = () => {
             </div>
 
             <h2 className="mt-6 text-2xl font-bold text-gray-900">
-              Login Required
+              Login Required as a Seller
             </h2>
 
             <p className="mt-3 text-gray-600 text-sm">
@@ -88,25 +100,6 @@ const Sell = () => {
               Login to Continue
             </button>
           </motion.div>
-        ) : (
-          /* This will briefly show while redirecting */
-          <motion.div
-            initial={{ y: 40, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            viewport={{ once: true }}
-            className="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-md text-center"
-          >
-            <h2 className="text-2xl font-bold text-gray-900">
-              Redirecting...
-            </h2>
-            <p className="mt-4 text-gray-600">
-              Taking you to the property listing form.
-            </p>
-            <div className="mt-6 flex justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
-            </div>
-          </motion.div>
-        )}
 
       </section>
     </div>

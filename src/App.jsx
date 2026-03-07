@@ -41,7 +41,7 @@ function App() {
         <Route path="/meeting" element={<BookMeeting />} />
         <Route path="/property/:id" element={<PropertyDetails />} />
         <Route path="/area-converter" element={<AreaConverter />} />
-        <Route path="/profile" element={<UserProfile />} /> {/* 👈 added profile route */}
+        <Route path="/profile" element={<UserProfile />} /> 
 
         {/* SELLER ROUTES */}
         <Route path="/seller" element={<SellerDashboard />}>

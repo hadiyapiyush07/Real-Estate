@@ -4,7 +4,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
 
-  // Determine if the current user is a seller based solely on user.role
+  // Determine role – only "seller" gets special treatment
   const isSeller = user?.role === "seller";
 
   const handleLogout = () => {
@@ -12,7 +12,7 @@ const Navbar = () => {
     navigate("/");
   };
 
-  // Helper to display the correct initial in the profile circle
+  // Get the first character for the profile circle
   const getInitial = () => {
     if (user?.firstName) return user.firstName.charAt(0).toUpperCase();
     if (user?.name) return user.name.charAt(0).toUpperCase();
@@ -20,7 +20,7 @@ const Navbar = () => {
     return "?";
   };
 
-  // Helper to get a friendly name for "Hello, ..."
+  // Get a friendly display name for the greeting
   const getDisplayName = () => {
     if (user?.firstName) return user.firstName;
     if (user?.name) return user.name;
@@ -33,17 +33,17 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-3 items-center h-20">
 
-          {/* LEFT MENU */}
+          {/* ---------- LEFT MENU ---------- */}
           <div className="flex items-center gap-6">
-            {/* Home link – goes to dashboard for sellers, homepage otherwise */}
+            {/* Home link – dashboard for sellers, homepage for others */}
             <NavLink to={isSeller ? "/seller" : "/"}>Home</NavLink>
 
-            {/* Show Add Property only for sellers */}
+            {/* Only sellers see "Add Property" */}
             {isSeller && (
               <NavLink to="/seller/add-property">Add Property</NavLink>
             )}
 
-            {/* Show other links only if user is NOT a seller */}
+            {/* For guests and buyers (non-sellers) show public links */}
             {(!user || !isSeller) && (
               <>
                 <NavLink to="/buy">Buy</NavLink>
@@ -53,7 +53,7 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* CENTER LOGO – goes to dashboard for sellers, homepage otherwise */}
+          {/* ---------- CENTER LOGO ---------- */}
           <Link
             to={isSeller ? "/seller" : "/"}
             className="text-center leading-tight cursor-pointer group"
@@ -63,19 +63,19 @@ const Navbar = () => {
             </h1>
           </Link>
 
-          {/* RIGHT MENU – changes based on login state */}
+          {/* ---------- RIGHT MENU (user / login) ---------- */}
           <div className="flex items-center justify-end gap-6 flex-nowrap">
             {user ? (
               <>
-                {/* Profile Circle (clickable to profile page) */}
-                <div 
+                {/* Profile circle – clickable to profile page */}
+                <div
                   onClick={() => navigate("/profile")}
                   className="bg-emerald-600 text-white w-9 h-9 rounded-full flex items-center justify-center font-semibold cursor-pointer hover:bg-emerald-700 transition-colors"
                 >
                   {getInitial()}
                 </div>
 
-                {/* User Info */}
+                {/* User info (hidden on very small screens) */}
                 <div className="text-sm hidden sm:block">
                   <p className="font-medium">
                     Hello, {getDisplayName()}
@@ -85,7 +85,7 @@ const Navbar = () => {
                   </p>
                 </div>
 
-                {/* Logout */}
+                {/* Logout button */}
                 <button
                   onClick={handleLogout}
                   className="text-red-500 text-sm hover:underline cursor-pointer"
@@ -111,7 +111,7 @@ const Navbar = () => {
 
 export default Navbar;
 
-/* Reusable NavLink */
+/* Reusable navigation link with animated underline */
 const NavLink = ({ to, children }) => (
   <Link
     to={to}

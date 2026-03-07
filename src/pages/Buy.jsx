@@ -367,12 +367,21 @@ const Buy = () => {
                     <p className="text-sm text-gray-500">
                       {p.district}, Gujarat
                     </p>
+                   <div className="mt-5 flex gap-3">
                     <button
-                      onClick={() => navigate(`/property/${p.id}`)}
-                      className="mt-3 w-full bg-black text-white py-2 rounded-lg hover:bg-emerald-600 cursor-pointer"
+                      onClick={() => navigate(`/property/${item.id}`)}
+                      className="flex-1 py-2 bg-black text-white rounded-md hover:bg-emerald-600 cursor-pointer"
                     >
                       View Details
                     </button>
+
+                    <button
+                      onClick={() => navigate("/meeting")}
+                      className="flex-1 py-2 border rounded-md hover:bg-gray-100 cursor-pointer"
+                    >
+                      Meet Broker
+                    </button>
+                  </div>
                   </div>
                 </div>
               );

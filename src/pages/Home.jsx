@@ -90,7 +90,7 @@ const Home = () => {
       {/* ================= HERO SECTION WITH SEARCH ================= */}
       <section className="relative h-[85vh] w-full">
         <img
-          src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"
+          src="https://images.unsplash.com/photo-1627857492021-1ace35b4c6b4"
           className="absolute inset-0 h-full w-full object-cover"
           alt=""
         />

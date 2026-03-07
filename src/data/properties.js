@@ -6,7 +6,7 @@ export const properties = [
     owner: "Ramesh Patel",
     type: "Agricultural Land",
     area: 25,
-    pricePerBigha: 18, // in lakh
+    pricePerBigha: 18, 
     images: [
       "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
       "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",

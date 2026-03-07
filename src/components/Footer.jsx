@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const Footer = () => {
   return (
     <footer className="bg-gray-100 border-t border-gray-200">
@@ -6,11 +8,13 @@ const Footer = () => {
         {/* TOP GRID */}
         <div className="grid gap-12 md:grid-cols-5">
 
-          {/* BRAND */}
+          {/* BRAND (links to home) */}
           <div className="md:col-span-2">
-            <h2 className="text-2xl font-extrabold text-gray-900">
-              ANAND CORPORATION
-            </h2>
+            <Link to="/" className="inline-block">
+              <h2 className="text-2xl font-extrabold text-gray-900 hover:text-emerald-600 transition">
+                ANAND CORPORATION
+              </h2>
+            </Link>
             <p className="mt-3 text-sm text-gray-600 leading-relaxed">
               ANAND CORPORATION is a trusted real-estate platform helping buyers
               and sellers connect with verified land listings, expert brokers,
@@ -24,8 +28,16 @@ const Footer = () => {
               Buy & Sell
             </h3>
             <ul className="mt-4 space-y-3 text-sm text-gray-600">
-              <li className="hover:text-emerald-600 cursor-pointer">Buy Land</li>
-              <li className="hover:text-emerald-600 cursor-pointer">Sell Land</li>
+              <li>
+                <Link to="/buy" className="hover:text-emerald-600 transition">
+                  Buy Land
+                </Link>
+              </li>
+              <li>
+                <Link to="/sell" className="hover:text-emerald-600 transition">
+                  Sell Land
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -35,8 +47,10 @@ const Footer = () => {
               Tools
             </h3>
             <ul className="mt-4 space-y-3 text-sm text-gray-600">
-              <li className="hover:text-emerald-600 cursor-pointer">
-                Area Converter
+              <li>
+                <Link to="/area-converter" className="hover:text-emerald-600 transition">
+                  Area Converter
+                </Link>
               </li>
             </ul>
           </div>
@@ -47,16 +61,16 @@ const Footer = () => {
               Support
             </h3>
             <ul className="mt-4 space-y-3 text-sm text-gray-600">
-              <li className="hover:text-emerald-600 cursor-pointer">
-                About Us
+              <li className="hover:text-emerald-600 transition cursor-pointer">
+                  About Us
               </li>
-              <li className="hover:text-emerald-600 cursor-pointer">
-                Contact Us
+             <li className="hover:text-emerald-600 transition cursor-pointer">
+                  Contact Us
               </li>
-              <li className="hover:text-emerald-600 cursor-pointer">
-                Privacy Policy
+              <li className="hover:text-emerald-600 transition cursor-pointer">
+                  Privacy Policy
               </li>
-              <li className="hover:text-emerald-600 cursor-pointer">
+              <li className="hover:text-emerald-600 transition cursor-pointer">
                 Terms & Conditions
               </li>
             </ul>
@@ -66,12 +80,11 @@ const Footer = () => {
 
         {/* DIVIDER */}
         <div className="mt-12 border-t border-gray-300 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-
           <p className="text-sm text-gray-600">
             © {new Date().getFullYear()} ANAND CORPORATION. All rights reserved.
           </p>
-
         </div>
+
       </div>
     </footer>
   );

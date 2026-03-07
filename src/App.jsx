@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import UserProfile from "./components/Userprofile";
 
 import Home from "./pages/Home";
 import Buy from "./pages/Buy";
@@ -40,6 +41,7 @@ function App() {
         <Route path="/meeting" element={<BookMeeting />} />
         <Route path="/property/:id" element={<PropertyDetails />} />
         <Route path="/area-converter" element={<AreaConverter />} />
+        <Route path="/profile" element={<UserProfile />} /> {/* 👈 added profile route */}
 
         {/* SELLER ROUTES */}
         <Route path="/seller" element={<SellerDashboard />}>
@@ -49,7 +51,6 @@ function App() {
 
         {/* <Route path="/Buyer" element={<BuyerDashboard />} >
           <Route path="my-meetings" element={<MyMeetings />} />
-
         </Route>    */}
 
       </Routes>

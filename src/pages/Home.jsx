@@ -191,14 +191,14 @@ const Home = () => {
                   <div className="mt-5 flex gap-3">
                     <button
                       onClick={() => navigate(`/property/${item.id}`)}
-                      className="flex-1 py-2 bg-black text-white rounded-md hover:bg-emerald-600"
+                      className="flex-1 py-2 bg-black text-white rounded-md hover:bg-emerald-600 cursor-pointer"
                     >
                       View Details
                     </button>
 
                     <button
                       onClick={() => navigate("/meeting")}
-                      className="flex-1 py-2 border rounded-md hover:bg-gray-100"
+                      className="flex-1 py-2 border rounded-md hover:bg-gray-100 cursor-pointer"
                     >
                       Meet Broker
                     </button>

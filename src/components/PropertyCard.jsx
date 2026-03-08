@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom"; // new import
 import { Share2, Heart } from "lucide-react";
 
 const formatPrice = (num) => {
@@ -10,12 +11,14 @@ const formatPrice = (num) => {
 };
 
 const PropertyCard = ({ property, onEdit, onDelete }) => {
+  const navigate = useNavigate(); // new
+
   const totalPrice =
     property.totalPrice && property.totalPrice !== ""
       ? Number(property.totalPrice)
       : property.area && property.pricePerUnit
-      ? Number(property.area) * Number(property.pricePerUnit)
-      : 0;
+        ? Number(property.area) * Number(property.pricePerUnit)
+        : 0;
 
   const pricePerUnit = property.pricePerUnit
     ? Number(property.pricePerUnit)
@@ -23,16 +26,26 @@ const PropertyCard = ({ property, onEdit, onDelete }) => {
 
   const unit = property.unit || "Bigha";
 
+
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return "https://images.unsplash.com/photo-1500382017468-9049fed747ef";
+
+    // If it's already a full URL, return as is
+    if (imagePath.startsWith('http')) return imagePath;
+
+    // Extract just the filename from the full path
+    const filename = imagePath.split('\\').pop().split('/').pop();
+
+    // Construct proper URL - note: /uploads/ matches the static serving in app.js
+    return `http://localhost:5000/uploads/properties/${filename}`;
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-md overflow-hidden">
-
       {/* IMAGE BANNER */}
       <div className="relative">
         <img
-          src={
-            property.images?.[0] ||
-            "https://images.unsplash.com/photo-1500382017468-9049fed747ef"
-          }
+          src={getImageUrl(property.images?.[0])}
           alt="property"
           className="w-full h-52 object-cover"
         />
@@ -40,13 +53,11 @@ const PropertyCard = ({ property, onEdit, onDelete }) => {
 
       {/* CONTENT */}
       <div className="p-4 space-y-2">
-
-        {/* PRICE PER UNIT (MAIN LIKE REFERENCE) */}
+        {/* PRICE PER UNIT */}
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold">
             ₹ {formatPrice(pricePerUnit)} / {unit}
           </h2>
-
         </div>
 
         {/* TOTAL BADGE */}
@@ -75,8 +86,11 @@ const PropertyCard = ({ property, onEdit, onDelete }) => {
           {property.district || "Location"} Gujarat
         </p>
 
-        {/* VIEW DETAILS */}
-        <button className="w-full mt-3 bg-black text-white py-2 rounded-lg">
+        {/* VIEW DETAILS – now navigates */}
+        <button
+          onClick={() => navigate(`/property/${property.id}`)} // new
+          className="w-full mt-3 bg-black text-white py-2 rounded-lg"
+        >
           View Details
         </button>
       </div>

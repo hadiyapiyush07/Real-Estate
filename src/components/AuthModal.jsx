@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { X } from "lucide-react";
+import { X, Eye, EyeOff } from "lucide-react";
 import api from "../config/axios";
+
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const AuthModal = () => {
@@ -12,7 +13,11 @@ const AuthModal = () => {
   const [role, setRole] = useState("buyer");
   const [image, setImage] = useState(null);
   const [imageFile, setImageFile] = useState(null);
-  const [isLoading, setIsLoading] = useState(false); // Add loading state
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [form, setForm] = useState({
     firstName: "",
@@ -40,26 +45,22 @@ const AuthModal = () => {
     if (!form.firstName.trim()) err.firstName = "First name is required";
     if (!form.lastName.trim()) err.lastName = "Last name is required";
 
-    if (!form.email.trim())
-      err.email = "Email is required";
+    if (!form.email.trim()) err.email = "Email is required";
     else if (!emailRegex.test(form.email))
       err.email = "Invalid email format";
 
-    if (!form.phone.trim())
-      err.phone = "Phone number is required";
+    if (!form.phone.trim()) err.phone = "Phone number is required";
     else if (form.phone.length !== 10)
       err.phone = "Phone must be 10 digits";
 
-    if (!form.password)
-      err.password = "Password is required";
+    if (!form.password) err.password = "Password is required";
     else if (form.password.length < 6)
       err.password = "Minimum 6 characters required";
 
-    if (!form.confirmPassword) {
+    if (!form.confirmPassword)
       err.confirmPassword = "Please confirm your password";
-    } else if (form.confirmPassword !== form.password) {
+    else if (form.confirmPassword !== form.password)
       err.confirmPassword = "Passwords do not match";
-    }
 
     setErrors(err);
     return Object.keys(err).length === 0;
@@ -68,8 +69,7 @@ const AuthModal = () => {
   const validateSignin = () => {
     let err = {};
 
-    if (!form.loginEmail)
-      err.loginEmail = "Email is required";
+    if (!form.loginEmail) err.loginEmail = "Email is required";
     else if (!emailRegex.test(form.loginEmail))
       err.loginEmail = "Invalid email";
 
@@ -82,7 +82,7 @@ const AuthModal = () => {
     return Object.keys(err).length === 0;
   };
 
-  /* ================= SUBMIT ================= */
+  /* ================= SIGNUP ================= */
 
   const handleSignup = async () => {
     if (!validateSignup()) return;
@@ -90,29 +90,26 @@ const AuthModal = () => {
     setIsLoading(true);
 
     try {
-      // Create FormData for handling file upload
       const formData = new FormData();
+
       formData.append("firstName", form.firstName);
       formData.append("lastName", form.lastName);
       formData.append("email", form.email);
       formData.append("phone", form.phone);
       formData.append("password", form.password);
       formData.append("role", role);
+
       if (imageFile) {
         formData.append("profilePhoto", imageFile);
       }
 
       const response = await api.post("/users/register", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-
-        },
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       if (response.status === 201) {
         const { token, user } = response.data;
 
-        // Store token and user data
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("userRole", user.role);
@@ -128,12 +125,16 @@ const AuthModal = () => {
         }, 500);
       }
     } catch (error) {
-      const errorMsg = error.response?.data?.message || "Registration failed. Please try again.";
+      const errorMsg =
+        error.response?.data?.message ||
+        "Registration failed. Please try again.";
       alert(errorMsg);
     } finally {
       setIsLoading(false);
     }
   };
+
+  /* ================= SIGNIN ================= */
 
   const handleSignin = async () => {
     if (!validateSignin()) return;
@@ -149,24 +150,16 @@ const AuthModal = () => {
       if (response.status === 200) {
         const { token, user } = response.data;
 
-        // Store token and user data
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("userRole", user.role);
-
         localStorage.setItem("isLoggedIn", "true");
-
 
         alert("Logged in successfully ✅");
 
-        // Redirect based on role
-        if (user.role === "buyer") {
-          navigate("/buy");
-        } else if (user.role === "seller") {
-          navigate("/sell");
-        } else {
-          navigate("/"); // Fallback
-        }
+        if (user.role === "buyer") navigate("/buy");
+        else if (user.role === "seller") navigate("/sell");
+        else navigate("/");
       }
     } catch (error) {
       const errorMsg = error.response?.data?.message || "Login failed.";
@@ -182,10 +175,9 @@ const AuthModal = () => {
       animate={{ scale: 1, opacity: 1 }}
       className="relative bg-white w-full max-w-xl rounded-xl shadow-2xl px-8 py-6"
     >
-      {/* CLOSE */}
       <button
         onClick={() => navigate("/")}
-        className="cursor-pointer absolute top-4 right-4 text-gray-400 hover:text-black text-xl"
+        className="cursor-pointer absolute top-4 right-4 text-gray-400 hover:text-black"
       >
         <X />
       </button>
@@ -195,28 +187,31 @@ const AuthModal = () => {
       </h2>
 
       {/* TABS */}
+
       <div className="flex border-b mb-6">
         <button
           onClick={() => setTab("signin")}
-          className={`cursor-pointer flex-1 pb-2 ${tab === "signin"
-            ? "border-b-2 border-emerald-600 text-emerald-600"
-            : "text-gray-400"
+          className={`flex-1 pb-2 ${tab === "signin"
+              ? "border-b-2 border-emerald-600 text-emerald-600"
+              : "text-gray-400"
             }`}
         >
           Sign In
         </button>
+
         <button
           onClick={() => setTab("signup")}
-          className={`cursor-pointer flex-1 pb-2 ${tab === "signup"
-            ? "border-b-2 border-emerald-600 text-emerald-600"
-            : "text-gray-400"
+          className={`flex-1 pb-2 ${tab === "signup"
+              ? "border-b-2 border-emerald-600 text-emerald-600"
+              : "text-gray-400"
             }`}
         >
           New Account
         </button>
       </div>
 
-      {/* ================= SIGN IN ================= */}
+      {/* SIGN IN */}
+
       {tab === "signin" && (
         <div className="space-y-4">
           <input
@@ -230,45 +225,59 @@ const AuthModal = () => {
             <p className="text-red-500 text-xs">{errors.loginEmail}</p>
           )}
 
-          <input
-            name="loginPassword"
-            type="password"
-            placeholder="Password"
-            value={form.loginPassword}
-            onChange={handleChange}
-            className="input"
-          />
+          <div className="relative">
+            <input
+              name="loginPassword"
+              type={showLoginPassword ? "text" : "password"}
+              placeholder="Password"
+              value={form.loginPassword}
+              onChange={handleChange}
+              className="input pr-10"
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowLoginPassword(!showLoginPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+            >
+              {showLoginPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+
           {errors.loginPassword && (
             <p className="text-red-500 text-xs">{errors.loginPassword}</p>
           )}
 
-          <p className="text-sm text-emerald-600 text-right cursor-pointer">
-            Forgot password?
-          </p>
-
           <button
             onClick={handleSignin}
             disabled={isLoading}
-            className="w-full bg-emerald-600 text-white py-3 rounded-md hover:bg-emerald-700 cursor-pointer disabled:bg-emerald-300 disabled:cursor-not-allowed"
+            className="w-full bg-emerald-600 text-white py-3 rounded-md hover:bg-emerald-700"
           >
             {isLoading ? "Signing in..." : "Sign In"}
           </button>
         </div>
       )}
 
-      {/* ================= SIGN UP ================= */}
+      {/* SIGN UP */}
+
       {tab === "signup" && (
         <div className="space-y-4">
-          {/* PHOTO + ROLE */}
+          {/* PROFILE IMAGE */}
+
           <div className="flex flex-col items-center gap-4">
             <label className="cursor-pointer">
               <div className="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
                 {image ? (
-                  <img src={image} alt="Profile" className="h-full w-full object-cover" />
+                  <img
+                    src={image}
+                    alt="Profile"
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   <span className="text-xs text-gray-500">Upload</span>
                 )}
               </div>
+
               <input
                 type="file"
                 hidden
@@ -276,8 +285,8 @@ const AuthModal = () => {
                 onChange={(e) => {
                   if (e.target.files[0]) {
                     const file = e.target.files[0];
-                    setImage(URL.createObjectURL(file)); // For preview
-                    setImageFile(file); // Store actual file for upload
+                    setImage(URL.createObjectURL(file));
+                    setImageFile(file);
                   }
                 }}
               />
@@ -289,9 +298,9 @@ const AuthModal = () => {
                   key={r}
                   type="button"
                   onClick={() => setRole(r)}
-                  className={`px-6 py-2 rounded-md border transition ${role === r
-                    ? "bg-emerald-600 text-white cursor-pointer"
-                    : "text-gray-600 cursor-pointer"
+                  className={`px-6 py-2 rounded-md border ${role === r
+                      ? "bg-emerald-600 text-white"
+                      : "text-gray-600"
                     }`}
                 >
                   {r.toUpperCase()}
@@ -300,99 +309,98 @@ const AuthModal = () => {
             </div>
           </div>
 
-          {/* FIRST + LAST */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <input
-                name="firstName"
-                placeholder="First Name"
-                value={form.firstName}
-                onChange={handleChange}
-                className="input"
-              />
-              {errors.firstName && (
-                <p className="text-red-500 text-xs">{errors.firstName}</p>
-              )}
-            </div>
+          {/* NAME */}
 
-            <div>
-              <input
-                name="lastName"
-                placeholder="Last Name"
-                value={form.lastName}
-                onChange={handleChange}
-                className="input"
-              />
-              {errors.lastName && (
-                <p className="text-red-500 text-xs">{errors.lastName}</p>
-              )}
-            </div>
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              name="firstName"
+              placeholder="First Name"
+              value={form.firstName}
+              onChange={handleChange}
+              className="input"
+            />
+
+            <input
+              name="lastName"
+              placeholder="Last Name"
+              value={form.lastName}
+              onChange={handleChange}
+              className="input"
+            />
           </div>
 
           {/* EMAIL */}
-          <div>
-            <input
-              name="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-              className="input"
-            />
-            {errors.email && (
-              <p className="text-red-500 text-xs">{errors.email}</p>
-            )}
-          </div>
+
+          <input
+            name="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            className="input"
+          />
 
           {/* PHONE */}
-          <div>
-            <input
-              name="phone"
-              placeholder="Phone Number"
-              value={form.phone}
-              onChange={handleChange}
-              className="input"
-            />
-            {errors.phone && (
-              <p className="text-red-500 text-xs">{errors.phone}</p>
-            )}
-          </div>
+
+          <input
+            name="phone"
+            placeholder="Phone Number"
+            value={form.phone}
+            onChange={handleChange}
+            className="input"
+          />
 
           {/* PASSWORD */}
+
           <div className="grid grid-cols-2 gap-4">
-            <div>
+            <div className="relative">
               <input
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 value={form.password}
                 onChange={handleChange}
-                className="input"
+                className="input pr-10"
               />
-              {errors.password && (
-                <p className="text-red-500 text-xs">{errors.password}</p>
-              )}
+
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
 
-            {/* CONFIRM PASSWORD INPUT */}
-            <div>
+            <div className="relative">
               <input
                 name="confirmPassword"
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 placeholder="Confirm Password"
                 value={form.confirmPassword}
                 onChange={handleChange}
-                className="input"
+                className="input pr-10"
               />
-              {errors.confirmPassword && (
-                <p className="text-red-500 text-xs">{errors.confirmPassword}</p>
-              )}
+
+              <button
+                type="button"
+                onClick={() =>
+                  setShowConfirmPassword(!showConfirmPassword)
+                }
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+              >
+                {showConfirmPassword ? (
+                  <EyeOff size={18} />
+                ) : (
+                  <Eye size={18} />
+                )}
+              </button>
             </div>
           </div>
 
           <button
             onClick={handleSignup}
             disabled={isLoading}
-            className="w-full bg-emerald-600 text-white py-3 rounded-md hover:bg-emerald-700 cursor-pointer disabled:bg-emerald-300 disabled:cursor-not-allowed"
+            className="w-full bg-emerald-600 text-white py-3 rounded-md hover:bg-emerald-700"
           >
             {isLoading ? "Creating Account..." : "Create Account"}
           </button>
@@ -403,3 +411,4 @@ const AuthModal = () => {
 };
 
 export default AuthModal;
+

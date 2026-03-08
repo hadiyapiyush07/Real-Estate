@@ -163,9 +163,8 @@ const BookMeeting = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border ${
-                      errors.name ? "border-red-500" : "border-gray-200"
-                    } rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition shadow-sm`}
+                    className={`w-full px-4 py-3 border ${errors.name ? "border-red-500" : "border-gray-200"
+                      } rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition shadow-sm`}
                     placeholder="John Doe"
                   />
                   {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
@@ -181,9 +180,8 @@ const BookMeeting = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border ${
-                      errors.email ? "border-red-500" : "border-gray-200"
-                    } rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition shadow-sm`}
+                    className={`w-full px-4 py-3 border ${errors.email ? "border-red-500" : "border-gray-200"
+                      } rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition shadow-sm`}
                     placeholder="john@example.com"
                   />
                   {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
@@ -199,9 +197,8 @@ const BookMeeting = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border ${
-                      errors.phone ? "border-red-500" : "border-gray-200"
-                    } rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition shadow-sm`}
+                    className={`w-full px-4 py-3 border ${errors.phone ? "border-red-500" : "border-gray-200"
+                      } rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition shadow-sm`}
                     placeholder="9876543210"
                   />
                   {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}

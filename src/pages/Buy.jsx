@@ -2,7 +2,9 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
+import api from "../config/axios.jsx";
 import BuyTopBar from "../components/BuyTopBar";
+import PropertyCard from "../components/PropertyCard";
 
 /* ===== Fix Marker Icons ===== */
 delete L.Icon.Default.prototype._getIconUrl;
@@ -19,120 +21,6 @@ L.Icon.Default.mergeOptions({
 const gujaratBounds = [
   [20.0, 68.0],
   [24.7, 74.5],
-];
-
-/* ===== EXISTING DEMO PROPERTIES ===== */
-const demoProperties = [
-  {
-    id: "demo1",
-    propertyType: "Agricultural Land",
-    city: "Ahmedabad",
-    district: "Ahmedabad",
-    totalPrice: 10000000,
-    area: "1",
-    unit: "Bigha",
-    coords: [23.0225, 72.5714],
-    image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-  },
-  {
-    id: "demo2",
-    propertyType: "Farm Land",
-    city: "Rajkot",
-    district: "Rajkot",
-    totalPrice: 115200000,
-    area: "12",
-    unit: "Bigha",
-    coords: [22.3039, 70.8022],
-    image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
-  },
-  {
-    id: "demo3",
-    propertyType: "Residential Plot",
-    city: "Surat",
-    district: "Surat",
-    totalPrice: 8500000,
-    area: "2",
-    unit: "Bigha",
-    coords: [21.1702, 72.8311],
-    image: "https://images.unsplash.com/photo-1507089947368-19c1da9775ae",
-  },
-  {
-    id: "demo4",
-    propertyType: "Agricultural Land",
-    city: "Vadodara",
-    district: "Vadodara",
-    totalPrice: 7200000,
-    area: "3",
-    unit: "Bigha",
-    coords: [22.3072, 73.1812],
-    image: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5",
-  },
-  {
-    id: "demo5",
-    propertyType: "Farm Land",
-    city: "Gandhinagar",
-    district: "Gandhinagar",
-    totalPrice: 9300000,
-    area: "2",
-    unit: "Bigha",
-    coords: [23.2156, 72.6369],
-    image: "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
-  },
-  {
-    id: "demo6",
-    propertyType: "Agricultural Land",
-    city: "Bhavnagar",
-    district: "Bhavnagar",
-    totalPrice: 5400000,
-    area: "4",
-    unit: "Bigha",
-    coords: [21.7645, 72.1519],
-    image: "https://images.unsplash.com/photo-1470770841072-f978cf4d019e",
-  },
-  {
-    id: "demo7",
-    propertyType: "Farm Land",
-    city: "Jamnagar",
-    district: "Jamnagar",
-    totalPrice: 6100000,
-    area: "3",
-    unit: "Bigha",
-    coords: [22.4707, 70.0577],
-    image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
-  },
-  {
-    id: "demo8",
-    propertyType: "Residential Plot",
-    city: "Junagadh",
-    district: "Junagadh",
-    totalPrice: 4800000,
-    area: "2",
-    unit: "Bigha",
-    coords: [21.5222, 70.4579],
-    image: "https://images.unsplash.com/photo-1500534623283-312aade485b7",
-  },
-  {
-    id: "demo9",
-    propertyType: "Agricultural Land",
-    city: "Anand",
-    district: "Anand",
-    totalPrice: 6900000,
-    area: "3",
-    unit: "Bigha",
-    coords: [22.5645, 72.9289],
-    image: "https://images.unsplash.com/photo-1491553895911-0055eca6402d",
-  },
-  {
-    id: "demo10",
-    propertyType: "Farm Land",
-    city: "Mehsana",
-    district: "Mehsana",
-    totalPrice: 5600000,
-    area: "2",
-    unit: "Bigha",
-    coords: [23.5880, 72.3693],
-    image: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e",
-  },
 ];
 
 /* ===== Map Zoom Handler ===== */
@@ -161,21 +49,37 @@ const Buy = () => {
   const [properties, setProperties] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [selectedCity, setSelectedCity] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  /* ===== FETCH + MERGE DATA ===== */
+  /* ===== FETCH PROPERTIES FROM BACKEND USING CUSTOM AXIOS ===== */
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("properties")) || [];
-
-    const formattedStored = stored.map((p) => ({
-      ...p,
-      coords: [parseFloat(p.lat), parseFloat(p.lng)],
-      totalPrice: Number(p.totalPrice),
-      image: p.images?.[0] || "https://via.placeholder.com/400",
-    }));
-
-    const allProperties = [...demoProperties, ...formattedStored];
-    setProperties(allProperties);
-    setFiltered(allProperties);
+    const fetchProperties = async () => {
+      try {
+        setLoading(true);
+        // Use api instance – baseURL is already set
+        const response = await api.get("/buyerProperty?limit=100");
+        const fetched = response.data.properties.map((p) => ({
+          ...p,
+          id: p._id,
+          coords: [parseFloat(p.lat), parseFloat(p.lng)],
+          totalPrice: Number(p.totalPrice),
+          // Build full image URL – adjust base if needed
+          image: p.images?.[0]
+            ? `http://localhost:5000/${p.images[0]}`
+            : "https://via.placeholder.com/400",
+          city: p.district,
+        }));
+        setProperties(fetched);
+        setFiltered(fetched);
+      } catch (err) {
+        console.error("Error fetching properties:", err);
+        setError("Failed to load properties. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProperties();
   }, []);
 
   /* ===== Handle initial URL param ===== */
@@ -210,8 +114,9 @@ const Buy = () => {
         p.city?.toLowerCase().includes(filters.location.toLowerCase())
       );
       setSelectedCity(filters.location);
-      // Update URL with new city
-      navigate(`/buy?location=${encodeURIComponent(filters.location)}`, { replace: true });
+      navigate(`/buy?location=${encodeURIComponent(filters.location)}`, {
+        replace: true,
+      });
     }
 
     if (filters.price) {
@@ -233,7 +138,6 @@ const Buy = () => {
     const matched = properties.filter((p) => p.city === city);
     setFiltered(matched);
     setSelectedCity(city);
-    // Update URL
     navigate(`/buy?location=${encodeURIComponent(city)}`, { replace: true });
   };
 
@@ -242,6 +146,22 @@ const Buy = () => {
     setSelectedCity("");
     navigate("/buy", { replace: true });
   };
+
+  if (loading) {
+    return (
+      <div className="h-[calc(100vh-80px)] flex items-center justify-center">
+        <div className="text-xl">Loading properties...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-[calc(100vh-80px)] flex items-center justify-center">
+        <div className="text-xl text-red-600">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-[calc(100vh-80px)] flex flex-col">
@@ -282,7 +202,6 @@ const Buy = () => {
                 )
             )}
 
-            {/* Zoom handler that reacts to selectedCity */}
             <MapZoomHandler city={selectedCity} properties={properties} />
           </MapContainer>
         </div>
@@ -311,81 +230,9 @@ const Buy = () => {
           )}
 
           <div className="grid md:grid-cols-2 gap-6">
-            {filtered.map((p) => {
-              const pricePerUnit =
-                p.pricePerUnit && p.area
-                  ? Number(p.pricePerUnit)
-                  : p.totalPrice && p.area
-                  ? Math.round(Number(p.totalPrice) / Number(p.area))
-                  : 0;
-
-              const totalPrice = Number(p.totalPrice) || 0;
-              const unit = p.unit || "Bigha";
-
-              const formatPrice = (num) => {
-                if (!num) return "0";
-                if (num >= 10000000) return (num / 10000000).toFixed(2) + " Cr";
-                if (num >= 100000) return (num / 100000).toFixed(2) + " Lakh";
-                return num.toLocaleString("en-IN");
-              };
-
-              return (
-                <div
-                  key={p.id}
-                  className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition"
-                >
-                  <div className="relative">
-                    <img
-                      src={p.image}
-                      className="h-48 w-full object-cover"
-                      alt="property"
-                    />
-                  </div>
-                  <div className="p-4 space-y-2">
-                    <div className="flex justify-between items-center">
-                      <h2 className="text-xl font-bold text-gray-900">
-                        ₹ {formatPrice(pricePerUnit)} / {unit}
-                      </h2>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-600 text-sm">Total:</span>
-                      <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-semibold">
-                        ₹ {formatPrice(totalPrice)}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-700">
-                      Area:{" "}
-                      <span className="font-semibold">
-                        {p.area} {unit.toUpperCase()}
-                      </span>
-                      {" • "}
-                      Type{" "}
-                      <span className="font-semibold">
-                        {p.propertyType}
-                      </span>
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {p.district}, Gujarat
-                    </p>
-                   <div className="mt-5 flex gap-3">
-                    <button
-                      onClick={() => navigate(`/property/${item.id}`)}
-                      className="flex-1 py-2 bg-black text-white rounded-md hover:bg-emerald-600 cursor-pointer"
-                    >
-                      View Details
-                    </button>
-
-                    <button
-                      onClick={() => navigate("/meeting")}
-                      className="flex-1 py-2 border rounded-md hover:bg-gray-100 cursor-pointer"
-                    >
-                      Meet Broker
-                    </button>
-                  </div>
-                  </div>
-                </div>
-              );
-            })}
+            {filtered.map((p) => (
+              <PropertyCard key={p.id} property={p} />
+            ))}
           </div>
         </div>
       </div>
